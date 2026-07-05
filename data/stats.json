@@ -1,0 +1,90 @@
+{
+  "program": "SOMBA — Cal Lutheran School of Management Brand Ambassadors",
+  "config": {
+    "platforms": [
+      {
+        "id": "instagram",
+        "name": "Instagram",
+        "enabled": true,
+        "handle": "@somambassadors",
+        "url": "https://www.instagram.com/somambassadors/",
+        "color": "#C13584",
+        "extras": [
+          "posts",
+          "following"
+        ]
+      },
+      {
+        "id": "tiktok",
+        "name": "TikTok",
+        "enabled": true,
+        "handle": "@somambassadors",
+        "url": "https://www.tiktok.com/@somambassadors",
+        "color": "#00B4C5",
+        "extras": [
+          "likes",
+          "videos"
+        ]
+      },
+      {
+        "id": "youtube",
+        "name": "YouTube",
+        "enabled": true,
+        "handle": "SOMAmbassadors",
+        "channel_id": "UCrb0Sg7TA_UpNd7mhnna2HQ",
+        "url": "https://www.youtube.com/channel/UCrb0Sg7TA_UpNd7mhnna2HQ",
+        "color": "#CC0000",
+        "extras": [
+          "views",
+          "videos"
+        ]
+      },
+      {
+        "id": "linkedin",
+        "name": "LinkedIn",
+        "enabled": true,
+        "handle": "School of Management Brand Ambassadors",
+        "url": "https://www.linkedin.com/company/school-of-management-brand-ambassadors/",
+        "color": "#0A66C2",
+        "extras": []
+      },
+      {
+        "id": "facebook",
+        "name": "Facebook",
+        "enabled": false,
+        "handle": null,
+        "url": null,
+        "color": "#1877F2",
+        "extras": [],
+        "note": "Fill in url and set enabled to true when the Facebook page exists. Numbers will be typed in manually each week."
+      }
+    ]
+  },
+  "snapshots": [
+    {
+      "date": "2026-07-05",
+      "platforms": {
+        "instagram": {
+          "followers": 756,
+          "following": 285,
+          "posts": 512,
+          "source": "scrape"
+        },
+        "tiktok": {
+          "followers": 151,
+          "likes": 13800,
+          "videos": 440,
+          "source": "scrape"
+        },
+        "youtube": {
+          "followers": null,
+          "source": "manual"
+        },
+        "linkedin": {
+          "followers": 3,
+          "source": "scrape"
+        }
+      }
+    }
+  ]
+}

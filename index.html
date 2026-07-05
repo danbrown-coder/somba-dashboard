@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOMBA — Social Media Dashboard · Cal Lutheran School of Management</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233F2A56'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Georgia' font-weight='bold' fill='%23FFC72C' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
+        integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF"
+        crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#f6f4f8; --card:#fff; --border:#e5e0ec; --ink:#292433;
+    --muted:#877f95; --label:#a29ab4;
+    --purple:#3F2A56; --purple-mid:#5d4380; --purple-soft:#efe9f6;
+    --gold:#FFC72C; --gold-deep:#b8860b; --gold-soft:#fff6dd;
+    --green:#3f8f63; --red:#bf4a33;
+    --shadow:0 1px 2px rgba(50,40,70,.05),0 6px 22px rgba(50,40,70,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .serif{font-family:"Newsreader",Georgia,serif}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 24px 90px}
+  .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--label);font-weight:700;margin:0 0 10px}
+  h1{font-family:"Newsreader",serif;font-weight:600;font-size:52px;letter-spacing:-.02em;
+    margin:6px 0 6px;line-height:1.04}
+  h1 em{font-style:italic;color:var(--purple-mid)}
+  .sub{font-size:18px;color:#4c4557;max-width:720px}
+  .sub a{color:var(--purple-mid);font-weight:600;text-decoration:none;white-space:nowrap}
+  .sub a:hover{text-decoration:underline}
+  .gen{font-size:14px;color:var(--muted);margin-top:10px}
+
+  /* total audience hero */
+  .hero{background:var(--purple);color:#fff;border-radius:20px;box-shadow:var(--shadow);
+    padding:34px 38px;margin-top:30px;display:flex;align-items:baseline;gap:26px;flex-wrap:wrap}
+  .hero .k{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:#cfc2e2;width:100%;margin-bottom:-8px}
+  .hero .v{font-family:"Newsreader",serif;font-size:74px;font-weight:600;letter-spacing:-.02em;
+    line-height:1;border-bottom:5px solid var(--gold);padding-bottom:8px}
+  .hero .d{font-size:17px;color:#e8e0f3}
+  .hero .d b{color:var(--gold)}
+
+  /* platform cards */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:22px 0 0}
+  .pcard{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:22px 24px;box-shadow:var(--shadow)}
+  .pcard .head{display:flex;align-items:center;gap:9px}
+  .pcard .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .pcard .name{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700}
+  .pcard .name a{color:inherit;text-decoration:none}
+  .pcard .name a:hover{color:var(--purple-mid)}
+  .pcard .row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .pcard .v{font-family:"Newsreader",serif;font-size:44px;font-weight:600;letter-spacing:-.02em;margin-top:4px}
+  .pcard .v small{font-size:18px;color:var(--muted);font-weight:500;margin-left:6px}
+  .pill{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:3px 11px}
+  .pill.up{background:#eef6f0;color:var(--green)}
+  .pill.down{background:#faefec;color:var(--red)}
+  .pill.flat{background:#f0edf4;color:var(--muted)}
+  .pill.stale{background:var(--gold-soft);color:var(--gold-deep)}
+  .pcard .extras{font-size:14px;color:var(--muted);margin-top:8px}
+
+  /* section card */
+  section{background:var(--card);border:1px solid var(--border);border-radius:18px;
+    padding:30px 32px;box-shadow:var(--shadow);margin-top:22px}
+  section h2{font-family:"Newsreader",serif;font-weight:600;font-size:30px;
+    letter-spacing:-.01em;margin:0 0 4px}
+  section .note{font-size:15px;color:var(--muted);margin:0 0 20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .chart-box{position:relative;height:260px}
+  .chart-box.tall{height:320px}
+  .chart-title{font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--label);font-weight:700;margin:0 0 8px}
+
+  /* empty / notice states */
+  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;
+    padding:46px 40px;text-align:center;box-shadow:var(--shadow);margin-top:26px}
+  .empty h2{font-family:"Newsreader",serif;font-size:30px;margin:0 0 12px}
+  .empty p{color:#4c4557;max-width:560px;margin:0 auto 10px}
+  .empty code{background:var(--purple-soft);padding:3px 9px;border-radius:6px;font-size:15px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--purple-soft);color:var(--purple-mid);
+    border:1px solid #ddd2ea;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
+  .hidden{display:none}
+
+  footer{margin-top:46px;text-align:center;font-size:14px;color:var(--muted)}
+  footer b{color:var(--purple-mid)}
+  @media(max-width:760px){
+    .cards{grid-template-columns:1fr} .grid2{grid-template-columns:1fr}
+    h1{font-size:38px} .hero .v{font-size:54px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SOMBA · Social Media</div>
+  <h1 class="serif">Brand Ambassadors, <em>by the numbers</em></h1>
+  <p class="sub" id="links">Follower growth across every SOMBA channel, updated weekly.</p>
+  <div id="gen" class="gen"></div>
+
+  <!-- shown until the first weekly update exists -->
+  <div id="empty" class="empty hidden">
+    <span class="badge">● Awaiting the first weekly update</span>
+    <h2 class="serif">No numbers yet</h2>
+    <p>Run the update script once on the program Mac and this page fills in:</p>
+    <p><code>python3 update_stats.py</code></p>
+    <p style="margin-top:14px">First time? The <b>README</b> walks through setup in plain English.</p>
+  </div>
+
+  <div id="report" class="hidden">
+    <div class="hero">
+      <div class="k">Total audience — all platforms</div>
+      <div class="v" id="hero-total"></div>
+      <div class="d" id="hero-delta"></div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <section id="sec-charts" class="hidden">
+      <h2 class="serif">Follower growth</h2>
+      <p class="note">Each platform on its own scale, so small accounts still show their trend.</p>
+      <div class="grid2" id="chartgrid"></div>
+    </section>
+
+    <section id="sec-total-chart" class="hidden">
+      <h2 class="serif">Total audience over time</h2>
+      <p class="note">Everyone following SOMBA anywhere, added together.</p>
+      <div class="chart-box tall"><canvas id="c-total"></canvas></div>
+    </section>
+
+    <div id="charts-soon" class="empty hidden">
+      <span class="badge">● Charts coming soon</span>
+      <h2 class="serif">Growth charts appear after your second weekly update</h2>
+      <p>One data point makes a dot, two make a line. Run the weekly update again
+         next week and the growth charts will draw themselves.</p>
+    </div>
+  </div>
+
+  <footer>Cal Lutheran School of Management · <b>SOMBA</b> Brand Ambassador Program</footer>
+</div>
+
+<script>
+const FULL = n => (n??0).toLocaleString();
+const FMT = n => n>=10000 ? (n/1000).toFixed(n>=100000?0:1).replace(/\.0$/,'')+'K' : FULL(n);
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+Chart.defaults.color = '#877f95';
+Chart.defaults.font.size = 13;
+Chart.defaults.animation = false;   // static report — draw fully, instantly
+
+const EXTRA_LABELS = {posts:'posts', following:'following', likes:'likes', videos:'videos', views:'views'};
+
+const prettyDate = iso => new Date(iso + 'T12:00:00')
+  .toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+const shortDate = iso => new Date(iso + 'T12:00:00')
+  .toLocaleDateString('en-US', {month:'short', day:'numeric'});
+
+fetch('data/stats.json?v=' + Date.now())
+  .then(r => { if(!r.ok) throw new Error('no data'); return r.json(); })
+  .then(render)
+  .catch(() => document.getElementById('empty').classList.remove('hidden'));
+
+// latest value & the most recent EARLIER non-null value, for honest deltas
+function series(snaps, pid){
+  return snaps.map(s => ({date:s.date, val:(s.platforms[pid]||{}).followers ?? null}));
+}
+function latestAndPrev(snaps, pid){
+  const pts = series(snaps, pid).filter(p => p.val != null);
+  return {latest: pts[pts.length-1] || null, prev: pts[pts.length-2] || null};
+}
+
+function deltaPill(latest, prev){
+  if(!latest || !prev) return '';
+  const d = latest.val - prev.val;
+  if(d > 0)  return `<span class="pill up">▲ +${FULL(d)}</span>`;
+  if(d < 0)  return `<span class="pill down">▼ ${FULL(d)}</span>`;
+  return `<span class="pill flat">— no change</span>`;
+}
+
+function render(d){
+  const platforms = d.config.platforms.filter(p => p.enabled);
+  const snaps = d.snapshots || [];
+  if(!snaps.length){
+    document.getElementById('empty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('report').classList.remove('hidden');
+  const latestSnap = snaps[snaps.length-1];
+  document.getElementById('gen').textContent = 'Last updated ' + prettyDate(latestSnap.date);
+
+  // profile links in the intro line
+  document.getElementById('links').innerHTML =
+    'Follower growth across every SOMBA channel, updated weekly · ' +
+    platforms.filter(p => p.url).map(p => `<a href="${p.url}" target="_blank" rel="noopener">${p.name}</a>`).join(' · ');
+
+  // --- hero total: latest vs previous snapshot, summed over platforms ---
+  let total = 0, prevTotal = 0, havePrev = false;
+  platforms.forEach(p => {
+    const {latest, prev} = latestAndPrev(snaps, p.id);
+    if(latest) total += latest.val;
+    if(latest && prev){ prevTotal += prev.val; havePrev = true; }
+    else if(latest){ prevTotal += latest.val; }
+  });
+  document.getElementById('hero-total').textContent = FULL(total);
+  document.getElementById('hero-delta').innerHTML = havePrev
+    ? (total-prevTotal === 0 ? 'no change since the last update'
+       : `<b>${total-prevTotal>0?'+':''}${FULL(total-prevTotal)}</b> since the last update`)
+    : 'first snapshot — growth tracking starts now';
+
+  // --- platform cards ---
+  document.getElementById('cards').innerHTML = platforms.map(p => {
+    const entry = latestSnap.platforms[p.id] || {};
+    const {latest, prev} = latestAndPrev(snaps, p.id);
+    const followers = entry.followers;
+    const stale = entry.source === 'carried'
+      ? `<span class="pill stale">reused from ${shortDate(entry.carried_from)}</span>` : '';
+    const extras = (p.extras||[])
+      .filter(k => entry[k] != null)
+      .map(k => `${FMT(entry[k])} ${EXTRA_LABELS[k]||k}`).join(' · ');
+    return `<div class="pcard">
+      <div class="head"><span class="dot" style="background:${p.color}"></span>
+        <span class="name"><a href="${p.url||'#'}" target="_blank" rel="noopener">${p.name}${p.handle ? ' · '+p.handle : ''}</a></span></div>
+      <div class="row">
+        <div class="v">${followers==null ? '—' : FULL(followers)}<small>followers</small></div>
+        ${followers==null ? '' : deltaPill(latest, prev)} ${stale}
+      </div>
+      ${extras ? `<div class="extras">${extras}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // --- charts (need 2+ snapshots) ---
+  if(snaps.length < 2){
+    document.getElementById('charts-soon').classList.remove('hidden');
+    return;
+  }
+  const labels = snaps.map(s => shortDate(s.date));
+  const ptRadius = snaps.length < 8 ? 3 : 0;
+
+  const grid = document.getElementById('chartgrid');
+  platforms.forEach(p => {
+    const vals = series(snaps, p.id).map(pt => pt.val);
+    if(!vals.some(v => v != null)) return;
+    const box = document.createElement('div');
+    box.innerHTML = `<div class="chart-title">${p.name}</div><div class="chart-box"><canvas id="c-${p.id}"></canvas></div>`;
+    grid.appendChild(box);
+    new Chart('c-'+p.id, {
+      type:'line',
+      data:{labels, datasets:[{label:'Followers', data:vals, borderColor:p.color,
+        backgroundColor:p.color+'1a', fill:true, tension:.3, spanGaps:true,
+        pointRadius:ptRadius, borderWidth:2.5}]},
+      options:{responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}},
+          y:{beginAtZero:false, grid:{color:'#efe9f6'}, ticks:{precision:0}}}}
+    });
+  });
+  document.getElementById('sec-charts').classList.remove('hidden');
+
+  // missing values carry the platform's last known count, matching the hero total
+  const lastKnown = {};
+  const totals = snaps.map(s => platforms.reduce((sum,p) => {
+    const v = (s.platforms[p.id]||{}).followers;
+    if(v != null) lastKnown[p.id] = v;
+    return sum + (lastKnown[p.id] ?? 0);
+  }, 0));
+  new Chart('c-total', {
+    type:'line',
+    data:{labels, datasets:[{label:'Total audience', data:totals, borderColor:'#5d4380',
+      backgroundColor:'rgba(93,67,128,.10)', fill:true, tension:.3,
+      pointRadius:ptRadius, borderWidth:2.5}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false}},
+        y:{beginAtZero:true, grid:{color:'#efe9f6'}, ticks:{precision:0}}}}
+  });
+  document.getElementById('sec-total-chart').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
