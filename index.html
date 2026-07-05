@@ -137,6 +137,25 @@
   .locrow .track{height:9px;background:var(--purple-soft);border-radius:5px;overflow:hidden}
   .locrow .fill{height:100%;background:linear-gradient(90deg,var(--purple-mid),var(--purple));border-radius:5px}
 
+  /* growth strategy */
+  .thesis{font-family:"Newsreader",serif;font-size:21px;line-height:1.45;max-width:820px;margin:0 0 8px}
+  .thesis b{color:var(--purple-mid)}
+  .playbook{background:var(--purple);color:#fff;border-radius:16px;padding:22px 26px;margin:18px 0 8px}
+  .playbook .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#cfc2e2;margin-bottom:6px}
+  .playbook .flow{font-family:"Newsreader",serif;font-size:22px;font-weight:600}
+  .playbook .flow em{font-style:normal;color:var(--gold)}
+  .playbook p{margin:8px 0 0;font-size:14px;color:#e8e0f3;line-height:1.5}
+  .strat{padding:20px 0;border-bottom:1px solid var(--border)}
+  .strat:last-child{border-bottom:0;padding-bottom:4px}
+  .strat .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .strat .head .dot{width:11px;height:11px;border-radius:50%;flex:none;align-self:center}
+  .strat h3{font-family:"Newsreader",serif;font-size:23px;font-weight:600;margin:0}
+  .strat .role{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--label);font-weight:700}
+  .strat .why{font-size:15px;color:#4c4557;margin:8px 0 10px;max-width:820px}
+  .strat ul{margin:0;padding-left:22px}
+  .strat li{font-size:15px;margin:6px 0;line-height:1.5}
+  .strat li b{color:var(--purple-mid)}
+
   footer{margin-top:46px;text-align:center;font-size:14px;color:var(--muted)}
   footer b{color:var(--purple-mid)}
   @media(max-width:760px){
@@ -223,10 +242,7 @@
     </section>
 
     <section id="sec-demo" class="hidden">
-      <div class="sec-head">
-        <h2 class="serif">Who we reach</h2>
-        <span class="pill stale hidden" id="demo-badge">Estimated — real analytics coming</span>
-      </div>
+      <h2 class="serif">Who we reach</h2>
       <p class="note" id="demo-note"></p>
       <div class="grid3">
         <div>
@@ -242,6 +258,89 @@
           <div class="chart-title">Top locations</div>
           <div id="loclist"></div>
         </div>
+      </div>
+    </section>
+
+    <section id="sec-strategy">
+      <h2 class="serif">Growth strategy</h2>
+      <p class="note">How SOMBA grows as a whole — and what each platform's job is.</p>
+
+      <p class="thesis">The numbers point to one playbook: <b>Instagram is the anchor</b> (two-thirds
+        of the audience), <b>TikTok is the reach engine</b> (13.8K likes from 151 followers — the
+        content already travels far beyond the follower base), <b>YouTube has proven demand</b>
+        (421K lifetime views, ~1,700 views for every subscriber), and
+        <b>LinkedIn is wide-open ground</b> for a school of management. The job now is converting
+        reach into followers — and doing it without tripling the workload.</p>
+
+      <div class="playbook">
+        <div class="k">The core workflow</div>
+        <div class="flow">Film once → post three times: <em>TikTok → Instagram Reel → YouTube Short</em></div>
+        <p>Every vertical video SOMBA already makes for TikTok is also a Reel and a Short.
+           One filming session feeds three platforms — reach triples, effort doesn't.</p>
+      </div>
+
+      <div class="strat">
+        <div class="head"><span class="dot" style="background:#C13584"></span>
+          <h3>Instagram</h3><span class="role">The anchor — deepen it</span></div>
+        <p class="why">756 followers and 512 posts make this the established home base. Growth here
+           comes from borrowed audiences and showing up consistently in Reels.</p>
+        <ul>
+          <li><b>3 Reels a week</b> — reuse the TikTok edits as-is; Reels is where Instagram hands out free reach.</li>
+          <li><b>Collab posts</b> with Cal Lutheran's main account, student orgs, and featured students — a collab post lands in both audiences' feeds and is the fastest borrow of an existing following.</li>
+          <li><b>Stories on event days</b> — polls, countdowns, and "tap to RSVP" stickers keep SOMBA at the top of the app for followers who miss posts.</li>
+          <li><b>Handle everywhere</b> — @somambassadors and a QR code on every flyer, slide deck, and event check-in table.</li>
+        </ul>
+      </div>
+
+      <div class="strat">
+        <div class="head"><span class="dot" style="background:#00B4C5"></span>
+          <h3>TikTok</h3><span class="role">The reach engine — convert it</span></div>
+        <p class="why">91 likes per follower means the For You feed already loves this content —
+           strangers watch it, they just don't follow yet. The gap between 13.8K likes and
+           151 followers is the single biggest free win on this dashboard.</p>
+        <ul>
+          <li><b>End every video with a reason to follow</b> — "follow for CLU business life" beats a generic outro; viewers follow accounts that promise a series, not single videos.</li>
+          <li><b>Make it a series</b> — "Day in the life of a SOM major," "Internship diaries," "Professor hot takes." Series turn one-time viewers into followers waiting for the next episode.</li>
+          <li><b>Reply-to-comment videos</b> — TikTok boosts them, and they signal an account worth following.</li>
+          <li><b>Ride trending sounds within 48 hours</b> — the current library of 440 videos shows the volume is there; timing is the lever.</li>
+        </ul>
+      </div>
+
+      <div class="strat">
+        <div class="head"><span class="dot" style="background:#CC0000"></span>
+          <h3>YouTube</h3><span class="role">The search asset — make it findable</span></div>
+        <p class="why">421K views against 243 subscribers means people arrive through Shorts and
+           search, watch, and leave. The channel earns attention; it needs to keep it.</p>
+        <ul>
+          <li><b>3 Shorts a week</b> from the TikTok pipeline — zero extra filming.</li>
+          <li><b>Searchable titles, not hashtag strings</b> — "Cal Lutheran business school day in the life" gets found for years; "#fyp #viral" gets found by no one.</li>
+          <li><b>Playlists per series</b> — binge-watching a playlist is what converts a viewer into a subscriber.</li>
+          <li><b>Pinned comment on every Short</b> linking the Instagram — send YouTube's drive-by traffic to the anchor platform.</li>
+        </ul>
+      </div>
+
+      <div class="strat">
+        <div class="head"><span class="dot" style="background:#0A66C2"></span>
+          <h3>LinkedIn</h3><span class="role">The whitespace — plant the flag</span></div>
+        <p class="why">3 followers at a school of management is the biggest mismatch on this page —
+           and the easiest to fix, because the ambassadors themselves are the distribution.</p>
+        <ul>
+          <li><b>Every ambassador lists SOMBA</b> as experience on their profile and follows the page — that alone puts the page in front of hundreds of connections.</li>
+          <li><b>One professional post a week</b> — event recaps, internship wins, alumni spotlights. LinkedIn rewards consistency over volume.</li>
+          <li><b>Use the page's invite credits</b> — LinkedIn gives company pages free connection invites every month; aim them at SOM students and alumni.</li>
+          <li><b>Tag the School of Management</b> and Cal Lutheran pages so their followers see SOMBA in the conversation.</li>
+        </ul>
+      </div>
+
+      <div class="strat">
+        <div class="head"><span class="dot" style="background:#1877F2"></span>
+          <h3>Facebook</h3><span class="role">Optional — decide deliberately</span></div>
+        <p class="why">Students aren't there, but parents and alumni are. Worth launching only if
+           those audiences matter to the program's goals.</p>
+        <ul>
+          <li><b>If launched, automate it</b> — Meta Business Suite can cross-post every Instagram post to Facebook automatically, so it costs zero extra effort.</li>
+          <li><b>Until then, skip it</b> — a dead page looks worse than no page.</li>
+        </ul>
       </div>
     </section>
   </div>
@@ -540,11 +639,10 @@ function renderDemographics(d){
   const dm = d.demographics;
   if(!dm || !dm.age || !dm.age.length) return;
   const est = !!dm.estimated;
-  document.getElementById('demo-badge').classList.toggle('hidden', !est);
-  document.getElementById('demo-note').textContent =
-    (est ? 'Estimated audience profile' : 'Audience profile') +
-    (dm.as_of ? ' as of ' + prettyDate(dm.as_of) : '') +
-    (est ? ' — will be replaced with real platform analytics.' : '.');
+  document.getElementById('demo-note').textContent = est
+    ? 'Illustrative estimates pending analytics export' +
+      (dm.as_of ? ' · as of ' + prettyDate(dm.as_of) : '')
+    : 'Audience profile' + (dm.as_of ? ' as of ' + prettyDate(dm.as_of) : '') + '.';
 
   const maxPct = Math.max(...dm.age.map(a => a.pct));
   new Chart('c-age', {

@@ -61,9 +61,12 @@ Two easy ways, both optional:
 - **Audience mix** — a donut chart of which platform holds how much of the
   audience
 - **Who we reach** — age, gender, and location breakdown. **Right now these
-  are clearly-labeled estimates** (there's a gold "Estimated" badge on the
-  section) because platforms only show real demographics to the account owner
-  inside their apps. See below for swapping in the real numbers.
+  are illustrative estimates** (the section's note line says so) because
+  platforms only show real demographics to the account owner inside their
+  apps. See below for swapping in the real numbers.
+- **Growth strategy** — the overall playbook (film once → post to TikTok,
+  Reels, and Shorts) plus a per-platform breakdown of each channel's job
+  and next moves.
 
 ## Replacing the estimated demographics with real numbers
 
