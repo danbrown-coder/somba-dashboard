@@ -68,7 +68,8 @@
           "followers": 756,
           "following": 285,
           "posts": 512,
-          "source": "scrape"
+          "source": "carried",
+          "carried_from": "2026-07-05"
         },
         "tiktok": {
           "followers": 151,
