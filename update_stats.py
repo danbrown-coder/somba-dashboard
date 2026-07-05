@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""SOMBA weekly stats updater.
+"""SOMBA stats updater — fully automatic, no keys, no prompts.
 
-Run this once a week:  python3 update_stats.py
-It fetches follower counts for every enabled platform in data/stats.json,
-asks you to type any number it can't fetch, saves a dated snapshot, and
-offers to publish (git push) so the live dashboard updates.
+Scrapes the public follower counts for every enabled platform in
+data/stats.json and saves a dated snapshot. It never asks a question:
+if a platform can't be read, it quietly reuses that platform's last
+known number (flagged so the dashboard can show a small "reused" note).
+
+Runs unattended every week in GitHub Actions, and can also be run by
+hand:  python3 update_stats.py
 
 Uses only Python's standard library — nothing to install.
 """
@@ -12,15 +15,12 @@ Uses only Python's standard library — nothing to install.
 import json
 import os
 import re
-import subprocess
 import sys
-import urllib.error
 import urllib.request
 from datetime import date
 
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(REPO_DIR, "data", "stats.json")
-KEY_FILE = os.path.join(REPO_DIR, ".yt_api_key")
 
 CHROME_UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -53,36 +53,9 @@ def parse_abbrev(s):
     return int(round(float(s) * mult))
 
 
-def ask(prompt):
-    """input() that survives non-interactive runs (returns '' at EOF)."""
-    try:
-        return input(prompt)
-    except EOFError:
-        print()
-        return ""
-
-
-def get_api_key():
-    """Read the saved YouTube API key, or ask for it once and remember it."""
-    if os.path.exists(KEY_FILE):
-        with open(KEY_FILE) as f:
-            key = f.read().strip()
-        if key:
-            return key
-    print()
-    print("YouTube needs a free API key (see README.md, step 2 — takes ~2 minutes).")
-    key = ask("Paste your YouTube API key (or press Enter to skip YouTube this week): ").strip()
-    if key:
-        with open(KEY_FILE, "w") as f:
-            f.write(key + "\n")
-        os.chmod(KEY_FILE, 0o600)
-        print("Saved — you won't be asked again.")
-    return key
-
-
 # ---------------------------------------------------------------- fetchers
 # Each fetcher returns a dict of metrics including "followers",
-# or raises an exception (which triggers the type-it-in fallback).
+# or raises an exception (which triggers a silent carry-forward).
 
 def fetch_instagram(p):
     html = http_get(p["url"], GOOGLEBOT_UA)
@@ -116,23 +89,23 @@ def fetch_tiktok(p):
     return out
 
 
-def fetch_youtube(p, api_key):
-    if not api_key:
-        raise RuntimeError("no API key")
-    url = (
-        "https://www.googleapis.com/youtube/v3/channels"
-        "?part=statistics&id=%s&key=%s" % (p["channel_id"], api_key)
-    )
-    body = json.loads(http_get(url, CHROME_UA))
-    items = body.get("items") or []
-    if not items:
-        raise RuntimeError("channel not found (check channel_id in data/stats.json)")
-    stats = items[0]["statistics"]
-    return {
-        "followers": int(stats.get("subscriberCount", 0)),
-        "views": int(stats.get("viewCount", 0)),
-        "videos": int(stats.get("videoCount", 0)),
-    }
+def fetch_youtube(p):
+    # The /about page reliably carries subscriber, video and total-view counts.
+    url = p["url"].rstrip("/") + "/about"
+    html = http_get(url, CHROME_UA)
+    subs = re.search(r'"([\d.,]+[KMB]?)\s+subscribers"', html)
+    if not subs:
+        raise RuntimeError("subscriber count not found in the YouTube page")
+    out = {"followers": parse_abbrev(subs.group(1))}
+    vids = re.search(r'"([\d.,]+[KMB]?)\s+videos"', html)
+    if vids:
+        out["videos"] = parse_abbrev(vids.group(1))
+    # viewCountText is the channel total; anchor to it so we don't grab
+    # a single video's view count that also appears on the page.
+    views = re.search(r'"viewCountText":"([\d.,]+)\s+views"', html)
+    if views:
+        out["views"] = parse_abbrev(views.group(1))
+    return out
 
 
 def fetch_linkedin(p):
@@ -144,18 +117,20 @@ def fetch_linkedin(p):
 
 
 def fetch_facebook(p):
-    raise RuntimeError("Facebook has no automatic fetch — numbers are typed in manually")
+    # No reliable public scrape for Facebook pages; carries forward if enabled.
+    raise RuntimeError("Facebook has no automatic fetch")
 
 
 FETCHERS = {
     "instagram": fetch_instagram,
     "tiktok": fetch_tiktok,
+    "youtube": fetch_youtube,
     "linkedin": fetch_linkedin,
     "facebook": fetch_facebook,
 }
 
 
-# ---------------------------------------------------------------- fallback
+# ---------------------------------------------------------------- carry-forward
 
 def last_known(prev_snap, platform_id):
     """(metrics dict, date) from the previous snapshot, or (None, None)."""
@@ -167,29 +142,15 @@ def last_known(prev_snap, platform_id):
     return entry, prev_snap["date"]
 
 
-def manual_fallback(p, reason, prev_snap):
-    """Couldn't fetch — ask for the follower count, or reuse the last one."""
+def carry_forward(p, prev_snap):
+    """Couldn't scrape — reuse the last known numbers, flagged as reused."""
     prev_entry, prev_date = last_known(prev_snap, p["id"])
-    print()
-    print("  Couldn't fetch %s automatically (%s)." % (p["name"], reason))
     if prev_entry:
-        hint = "or press Enter to reuse %s from %s" % (prev_entry["followers"], prev_date)
-    else:
-        hint = "or press Enter to skip"
-    while True:
-        raw = ask("  Type the current %s follower count (%s): " % (p["name"], hint)).strip()
-        if not raw:
-            if prev_entry:
-                # Carry everything forward, flagged as stale.
-                out = {k: v for k, v in prev_entry.items() if k not in ("source", "carried_from")}
-                out["source"] = "carried"
-                out["carried_from"] = prev_entry.get("carried_from", prev_date)
-                return out
-            return {"followers": None, "source": "manual"}
-        try:
-            return {"followers": parse_abbrev(raw), "source": "manual"}
-        except ValueError:
-            print("  That doesn't look like a number — try again (e.g. 756 or 13.8K).")
+        out = {k: v for k, v in prev_entry.items() if k not in ("source", "carried_from")}
+        out["source"] = "carried"
+        out["carried_from"] = prev_entry.get("carried_from", prev_date)
+        return out
+    return {"followers": None, "source": "carried"}
 
 
 # ---------------------------------------------------------------- snapshots
@@ -206,8 +167,8 @@ def save_data(data):
 
 
 def previous_snapshot(data, today):
-    """Most recent snapshot from a DIFFERENT day (so a same-day rerun
-    still compares against last week, not against itself)."""
+    """Most recent snapshot from a DIFFERENT day (so a same-day rerun still
+    compares against last week, not against itself)."""
     for snap in reversed(data["snapshots"]):
         if snap["date"] != today:
             return snap
@@ -257,31 +218,6 @@ def print_summary(snap, prev_snap, platforms):
     print("=" * 56)
 
 
-def offer_git_push(today):
-    print()
-    answer = ask("Publish to the live site now? [y/N]: ").strip().lower()
-    if answer != "y":
-        print()
-        print("Okay — when you're ready, run:")
-        print('  cd "%s" && git add data/stats.json && git commit -m "Weekly stats %s" && git push' % (REPO_DIR, today))
-        return
-    cmds = [
-        ["git", "add", "data/stats.json"],
-        ["git", "commit", "-m", "Weekly stats %s" % today],
-        ["git", "push"],
-    ]
-    for cmd in cmds:
-        result = subprocess.run(cmd, cwd=REPO_DIR)
-        if result.returncode != 0:
-            print()
-            print("That git step failed (see message above). Nothing is lost —")
-            print("your numbers are saved in data/stats.json. Fix the issue and rerun,")
-            print("or ask Claude Code for help.")
-            return
-    print()
-    print("Published! Render redeploys in about a minute.")
-
-
 # ---------------------------------------------------------------- main
 
 def main():
@@ -290,31 +226,24 @@ def main():
     today = date.today().isoformat()
     prev_snap = previous_snapshot(data, today)
 
-    api_key = get_api_key() if any(p["id"] == "youtube" for p in platforms) else ""
-
-    print()
     print("Fetching stats for %d platforms..." % len(platforms))
     snap = {"date": today, "platforms": {}}
     for p in platforms:
         sys.stdout.write("  %s... " % p["name"])
         sys.stdout.flush()
         try:
-            if p["id"] == "youtube":
-                metrics = fetch_youtube(p, api_key)
-                metrics["source"] = "api"
-            else:
-                metrics = FETCHERS[p["id"]](p)
-                metrics["source"] = "scrape"
+            metrics = FETCHERS[p["id"]](p)
+            metrics["source"] = "scrape"
             print("ok (%s followers)" % "{:,}".format(metrics["followers"]))
         except Exception as e:
-            print("failed")
-            metrics = manual_fallback(p, str(e), prev_snap)
+            metrics = carry_forward(p, prev_snap)
+            note = "reused last number" if metrics.get("followers") is not None else "no data yet"
+            print("could not read (%s) — %s" % (e, note))
         snap["platforms"][p["id"]] = metrics
 
     upsert_snapshot(data, snap)
     save_data(data)
     print_summary(snap, prev_snap, platforms)
-    offer_git_push(today)
 
 
 if __name__ == "__main__":

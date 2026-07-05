@@ -1,0 +1,35 @@
+name: Update SOMBA stats
+
+# Runs itself every Monday and refreshes the follower numbers.
+# Also runnable on demand from the Actions tab ("Run workflow").
+on:
+  schedule:
+    - cron: "0 14 * * 1"   # Mondays at 14:00 UTC (~7am Pacific)
+  workflow_dispatch:
+
+# Let the built-in token commit the updated data back to the repo.
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scrape the latest numbers
+        run: python3 update_stats.py
+
+      - name: Commit the update (only if something changed)
+        run: |
+          git config user.name  "somba-bot"
+          git config user.email "actions@github.com"
+          git add data/stats.json
+          git diff --staged --quiet || git commit -m "Auto stats update $(date +%F)"
+          git push

@@ -77,8 +77,10 @@
           "source": "scrape"
         },
         "youtube": {
-          "followers": null,
-          "source": "manual"
+          "followers": 243,
+          "videos": 222,
+          "views": 421115,
+          "source": "scrape"
         },
         "linkedin": {
           "followers": 3,
