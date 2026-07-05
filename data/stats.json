@@ -79,7 +79,7 @@
         "youtube": {
           "followers": 243,
           "videos": 222,
-          "views": 421115,
+          "views": 421136,
           "source": "scrape"
         },
         "linkedin": {
@@ -88,5 +88,179 @@
         }
       }
     }
-  ]
+  ],
+  "recent_videos": {
+    "fetched": "2026-07-05",
+    "source": "youtube-rss",
+    "videos": [
+      {
+        "id": "qK-rEkv98jc",
+        "title": "Last Event Energy #trackandfield #track #teammates #teamwork #athletes #teamenergy #relays #fyp",
+        "published": "2026-05-07",
+        "views": 598,
+        "likes": 8
+      },
+      {
+        "id": "mtbnjLbYoKI",
+        "title": "POV: Class of 2027 #classof2027 #senior #junior #realitycheck #collegehumor #studentlife",
+        "published": "2026-05-01",
+        "views": 1803,
+        "likes": 5
+      },
+      {
+        "id": "tAgIxdUgU4M",
+        "title": "Sports Career fair! #careeropportunities #ytshorts #fyp",
+        "published": "2026-04-30",
+        "views": 29,
+        "likes": 0
+      },
+      {
+        "id": "MMNa0c92NTc",
+        "title": "Practice or go home? #studentathlete #callutheran #sports",
+        "published": "2026-04-29",
+        "views": 1024,
+        "likes": 11
+      },
+      {
+        "id": "GMjfg-afTts",
+        "title": "packed gyms #athlete #gym #saxaphone",
+        "published": "2026-04-27",
+        "views": 951,
+        "likes": 3
+      },
+      {
+        "id": "f_lKH7O1S-M",
+        "title": "Procrastination #lastminute #relatable #collegelife #studentproblems #studytok",
+        "published": "2026-04-24",
+        "views": 905,
+        "likes": 8
+      },
+      {
+        "id": "OwIr8moiOGk",
+        "title": "Senior Spotlight JJ #senior #spotlight #fyp",
+        "published": "2026-04-17",
+        "views": 118,
+        "likes": 1
+      },
+      {
+        "id": "vEeukGTrvqE",
+        "title": "Study abroad students every Friday #studyabroad #travel #weekendtrip",
+        "published": "2026-04-16",
+        "views": 6079,
+        "likes": 82
+      },
+      {
+        "id": "PfVOtJaHLSA",
+        "title": "Friends Working Out Together #sports #studentatlete #swim #callutheran #fyp",
+        "published": "2026-04-15",
+        "views": 1469,
+        "likes": 10
+      },
+      {
+        "id": "tmzuQeGtxyE",
+        "title": "Preparing for FBLA... #fbla #fyp #funny #trending #students #academics",
+        "published": "2026-04-12",
+        "views": 2942,
+        "likes": 43
+      },
+      {
+        "id": "mvoIm97doQE",
+        "title": "Shut up mom 67.67% accuracy - college apps edition #funny #viral #college #fyp #accurate",
+        "published": "2026-04-11",
+        "views": 2572,
+        "likes": 56
+      },
+      {
+        "id": "7IHL3jwjDx8",
+        "title": "Dance to enter the time conference #fbla #sectionals #fyp #viral #ytshorts",
+        "published": "2026-04-10",
+        "views": 5081,
+        "likes": 56
+      },
+      {
+        "id": "8LtABSHhRJQ",
+        "title": "Shut up MOM! #funny #fyp #viral",
+        "published": "2026-04-09",
+        "views": 2659,
+        "likes": 37
+      },
+      {
+        "id": "uF77XP-tP-c",
+        "title": "Idk why the teacher hates me #fyp #fbla #sectionals #clu #studentlife #classclown #school #viral",
+        "published": "2026-04-08",
+        "views": 1582,
+        "likes": 33
+      },
+      {
+        "id": "mKtqrCU3cTI",
+        "title": "A-Aron 99.67% accuracy #viral #trending #fyp #fbla #meme #funny #skit #fyp",
+        "published": "2026-04-07",
+        "views": 2570,
+        "likes": 61
+      }
+    ]
+  },
+  "demographics": {
+    "estimated": true,
+    "as_of": "2026-07-05",
+    "note": "Placeholder estimates. Replace with real platform analytics and set estimated to false.",
+    "age": [
+      {
+        "band": "13–17",
+        "pct": 6
+      },
+      {
+        "band": "18–24",
+        "pct": 67
+      },
+      {
+        "band": "25–34",
+        "pct": 15
+      },
+      {
+        "band": "35–44",
+        "pct": 7
+      },
+      {
+        "band": "45+",
+        "pct": 5
+      }
+    ],
+    "gender": [
+      {
+        "label": "Women",
+        "pct": 58
+      },
+      {
+        "label": "Men",
+        "pct": 39
+      },
+      {
+        "label": "Other / undisclosed",
+        "pct": 3
+      }
+    ],
+    "locations": [
+      {
+        "name": "Thousand Oaks, CA",
+        "pct": 34
+      },
+      {
+        "name": "Los Angeles, CA",
+        "pct": 21
+      },
+      {
+        "name": "Ventura, CA",
+        "pct": 12
+      },
+      {
+        "name": "Camarillo, CA",
+        "pct": 9
+      },
+      {
+        "name": "Santa Barbara area",
+        "pct": 7
+      }
+    ]
+  }
 }

@@ -12,6 +12,7 @@ hand:  python3 update_stats.py
 Uses only Python's standard library — nothing to install.
 """
 
+import html as html_lib
 import json
 import os
 import re
@@ -119,6 +120,31 @@ def fetch_linkedin(p):
 def fetch_facebook(p):
     # No reliable public scrape for Facebook pages; carries forward if enabled.
     raise RuntimeError("Facebook has no automatic fetch")
+
+
+def fetch_youtube_videos(channel_id):
+    """Recent uploads from YouTube's official RSS feed (title, date, views, likes)."""
+    url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channel_id
+    xml = http_get(url, CHROME_UA)
+    videos = []
+    for entry in xml.split("<entry>")[1:]:
+        vid = re.search(r"<yt:videoId>([^<]+)</yt:videoId>", entry)
+        title = re.search(r"<media:title>([^<]*)</media:title>", entry)
+        pub = re.search(r"<published>(\d{4}-\d{2}-\d{2})", entry)
+        views = re.search(r'<media:statistics views="(\d+)"', entry)
+        likes = re.search(r'<media:starRating[^>]*count="(\d+)"', entry)
+        if not (vid and title and pub):
+            continue
+        videos.append({
+            "id": vid.group(1),
+            "title": html_lib.unescape(title.group(1)),
+            "published": pub.group(1),
+            "views": int(views.group(1)) if views else None,
+            "likes": int(likes.group(1)) if likes else None,
+        })
+    if not videos:
+        raise RuntimeError("no entries in the YouTube feed")
+    return videos
 
 
 FETCHERS = {
@@ -240,6 +266,17 @@ def main():
             note = "reused last number" if metrics.get("followers") is not None else "no data yet"
             print("could not read (%s) — %s" % (e, note))
         snap["platforms"][p["id"]] = metrics
+
+    yt = next((p for p in platforms if p["id"] == "youtube" and p.get("channel_id")), None)
+    if yt:
+        sys.stdout.write("  Recent videos... ")
+        sys.stdout.flush()
+        try:
+            vids = fetch_youtube_videos(yt["channel_id"])
+            data["recent_videos"] = {"fetched": today, "source": "youtube-rss", "videos": vids}
+            print("ok (%d videos)" % len(vids))
+        except Exception as e:
+            print("could not read (%s) — reused last list" % e)
 
     upsert_snapshot(data, snap)
     save_data(data)

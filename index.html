@@ -86,10 +86,62 @@
     border:1px solid #ddd2ea;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
   .hidden{display:none}
 
+  /* insight stat tiles */
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .stile{border:1px solid var(--border);border-radius:14px;padding:18px 20px;background:#fbfafc}
+  .stile .n{font-family:"Newsreader",serif;font-size:38px;font-weight:600;letter-spacing:-.02em}
+  .stile .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700;margin-top:2px}
+  .stile .c{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .stile.hi{border-top:4px solid var(--gold);background:var(--gold-soft)}
+  .milestone{font-family:"Newsreader",serif;font-size:22px;margin:18px 0 0;line-height:1.35}
+  .milestone b{color:var(--purple-mid)}
+  /* recent videos list */
+  .vidrow{display:grid;grid-template-columns:30px 1fr auto;gap:14px;align-items:center;
+    padding:11px 8px;border-bottom:1px solid var(--border);border-radius:8px}
+  .vidrow:last-child{border-bottom:0}
+  .vidrow:hover{background:var(--purple-soft)}
+  .vidrow.top{background:var(--gold-soft)}
+  .vidrow .rank{font-family:"Newsreader",serif;font-size:20px;color:var(--label);text-align:center}
+  .vidrow .t{font-size:15px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vidrow .t a{color:var(--ink);text-decoration:none}
+  .vidrow .t a:hover{color:var(--purple-mid)}
+  .vidrow .meta{font-size:12.5px;color:var(--muted);margin-top:1px}
+  .vidrow .v{text-align:right;font-variant-numeric:tabular-nums}
+  .vidrow .v b{font-size:16px}
+  .vidrow .v small{display:block;font-size:12px;color:var(--muted)}
+  /* audience mix donut */
+  .donut-wrap{position:relative;height:300px}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+  .donut-center .n{font-family:"Newsreader",serif;font-size:40px;font-weight:600}
+  .donut-center .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--label);font-weight:700}
+  .mixrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:15px}
+  .mixrow:last-child{border-bottom:0}
+  .mixrow .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .mixrow .nm{font-weight:600;flex:1}
+  .mixrow .ct{color:var(--muted);font-variant-numeric:tabular-nums}
+  .mixrow .pc{width:52px;text-align:right;font-weight:700;color:var(--purple-mid);font-variant-numeric:tabular-nums}
+  /* demographics */
+  .sec-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  .sec-head h2{margin:0}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px}
+  .chart-box.short{height:220px}
+  .splitbar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:10px 0 12px}
+  .splitbar span{height:100%}
+  .glegend{display:flex;align-items:center;gap:8px;font-size:14px;padding:4px 0}
+  .glegend .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .glegend .p{margin-left:auto;font-weight:700;color:var(--purple-mid)}
+  .locrow{padding:7px 0}
+  .locrow .toprow{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+  .locrow .toprow b{font-weight:600}
+  .locrow .toprow span{color:var(--muted);font-weight:700}
+  .locrow .track{height:9px;background:var(--purple-soft);border-radius:5px;overflow:hidden}
+  .locrow .fill{height:100%;background:linear-gradient(90deg,var(--purple-mid),var(--purple));border-radius:5px}
+
   footer{margin-top:46px;text-align:center;font-size:14px;color:var(--muted)}
   footer b{color:var(--purple-mid)}
   @media(max-width:760px){
     .cards{grid-template-columns:1fr} .grid2{grid-template-columns:1fr}
+    .statgrid{grid-template-columns:repeat(2,1fr)} .grid3{grid-template-columns:1fr}
     h1{font-size:38px} .hero .v{font-size:54px}
   }
 </style>
@@ -135,8 +187,63 @@
       <span class="badge">● Charts coming soon</span>
       <h2 class="serif">Growth charts appear after next week's update</h2>
       <p>One data point makes a dot, two make a line. The numbers refresh
-         automatically every Monday, and the growth charts will draw themselves.</p>
+         automatically every Monday, and the growth charts — and milestone
+         projections — will draw themselves.</p>
     </div>
+
+    <section id="sec-pace" class="hidden">
+      <h2 class="serif">Growth pace</h2>
+      <p class="note">Average weekly change, measured across every snapshot.</p>
+      <div class="statgrid" id="pace-tiles"></div>
+      <p class="milestone" id="milestone"></p>
+    </section>
+
+    <section id="sec-engage" class="hidden">
+      <h2 class="serif">Engagement</h2>
+      <p class="note">What the audience does, not just how big it is.</p>
+      <div class="statgrid" id="engage-tiles"></div>
+    </section>
+
+    <section id="sec-videos" class="hidden">
+      <h2 class="serif">Recent content</h2>
+      <p class="note">The most recent YouTube uploads, ranked by views. Hashtag titles are Shorts.</p>
+      <div id="vidlist"></div>
+    </section>
+
+    <section id="sec-mix" class="hidden">
+      <h2 class="serif">Audience mix</h2>
+      <p class="note">Where the total audience lives.</p>
+      <div class="grid2">
+        <div class="donut-wrap"><canvas id="c-mix"></canvas><div class="donut-center" id="mix-center"></div></div>
+        <div>
+          <div id="mix-legend"></div>
+          <p class="milestone" id="mix-takeaway"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-demo" class="hidden">
+      <div class="sec-head">
+        <h2 class="serif">Who we reach</h2>
+        <span class="pill stale hidden" id="demo-badge">Estimated — real analytics coming</span>
+      </div>
+      <p class="note" id="demo-note"></p>
+      <div class="grid3">
+        <div>
+          <div class="chart-title">Age</div>
+          <div class="chart-box short"><canvas id="c-age"></canvas></div>
+        </div>
+        <div>
+          <div class="chart-title">Gender</div>
+          <div class="splitbar" id="genderbar"></div>
+          <div id="genderlegend"></div>
+        </div>
+        <div>
+          <div class="chart-title">Top locations</div>
+          <div id="loclist"></div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <footer>Cal Lutheran School of Management · <b>SOMBA</b> Brand Ambassador Program<br>
@@ -231,11 +338,21 @@ function render(d){
     </div>`;
   }).join('');
 
-  // --- charts (need 2+ snapshots) ---
-  if(snaps.length < 2){
+  // --- history-dependent sections (need 2+ snapshots) ---
+  if(snaps.length >= 2){
+    renderHistoryCharts(platforms, snaps);
+    try{ renderPace(platforms, snaps); }catch(e){}
+  } else {
     document.getElementById('charts-soon').classList.remove('hidden');
-    return;
   }
+  // --- always-on insight sections, each independently degradable ---
+  try{ renderEngagement(platforms, snaps); }catch(e){}
+  try{ renderVideos(d); }catch(e){}
+  try{ renderMix(platforms, snaps); }catch(e){}
+  try{ renderDemographics(d); }catch(e){}
+}
+
+function renderHistoryCharts(platforms, snaps){
   const labels = snaps.map(s => shortDate(s.date));
   const ptRadius = snaps.length < 8 ? 3 : 0;
 
@@ -277,6 +394,189 @@ function render(d){
         y:{beginAtZero:true, grid:{color:'#efe9f6'}, ticks:{precision:0}}}}
   });
   document.getElementById('sec-total-chart').classList.remove('hidden');
+}
+
+// ---------- insight helpers ----------
+const show = id => document.getElementById(id).classList.remove('hidden');
+const escapeHtml = s => String(s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ratio = (a,b) => (a==null || b==null || b===0) ? null : a/b;
+
+function ageOf(iso){
+  const days = Math.max(0, Math.round((Date.now() - new Date(iso+'T12:00:00'))/86400000));
+  if(days < 7)  return days <= 1 ? 'today' : days + ' days ago';
+  const w = Math.round(days/7);
+  if(w < 9)     return w + (w === 1 ? ' week ago' : ' weeks ago');
+  const m = Math.round(days/30.4);
+  if(m < 12)    return m + (m === 1 ? ' month ago' : ' months ago');
+  return (days/365.25).toFixed(1) + ' years ago';
+}
+
+function weeksBetween(a,b){
+  return Math.max(1, Math.abs(new Date(b+'T12:00:00') - new Date(a+'T12:00:00')) / (7*86400000));
+}
+
+function weeklyRate(snaps, pid){
+  const pts = series(snaps, pid).filter(p => p.val != null);
+  if(pts.length < 2) return null;
+  const first = pts[0], last = pts[pts.length-1];
+  return {perWeek: (last.val - first.val) / weeksBetween(first.date, last.date),
+          current: last.val, weeks: weeksBetween(first.date, last.date)};
+}
+
+const MILESTONES = [50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000];
+
+// ---------- growth pace (needs history) ----------
+function renderPace(platforms, snaps){
+  const rates = platforms.map(p => ({p, r: weeklyRate(snaps, p.id)})).filter(x => x.r);
+  if(!rates.length) return;
+  const totalRate = rates.reduce((s,x) => s + x.r.perWeek, 0);
+  const tiles = [{
+    n: (totalRate >= 0 ? '+' : '') + Math.round(totalRate) + ' / wk',
+    k: 'Total audience growth', c: 'new followers per week, all platforms combined'
+  }];
+  // ignore tiny accounts (a 2→3 follower week is 50% "growth" but no story)
+  const fastest = rates.filter(x => x.r.current >= 50 && x.r.perWeek > 0)
+    .sort((a,b) => b.r.perWeek/b.r.current - a.r.perWeek/a.r.current)[0];
+  if(fastest) tiles.push({
+    n: fastest.p.name, k: 'Fastest-growing platform',
+    c: (100*fastest.r.perWeek/fastest.r.current).toFixed(1) + '% growth per week'
+  });
+  document.getElementById('pace-tiles').innerHTML = tiles.map(t =>
+    `<div class="stile"><div class="n">${t.n}</div><div class="k">${t.k}</div><div class="c">${t.c}</div></div>`).join('');
+
+  // milestone projection: biggest platform with a sane, positive trajectory
+  let ms = '';
+  const candidates = rates.filter(x => x.r.perWeek > 0 && x.r.current >= 50 && x.r.weeks >= 1)
+    .sort((a,b) => b.r.current - a.r.current);
+  for(const x of candidates){
+    const target = MILESTONES.find(m => m > x.r.current);
+    if(!target) continue;
+    const weeks = (target - x.r.current) / x.r.perWeek;
+    if(weeks > 156) continue;   // >3 years out isn't a story
+    const when = new Date(Date.now() + weeks*7*86400000)
+      .toLocaleDateString('en-US', {month:'long', year:'numeric'});
+    ms = `At this pace, ${x.p.name} passes <b>${FULL(target)} followers</b> by ~${when}.`;
+    break;
+  }
+  document.getElementById('milestone').innerHTML = ms;
+  show('sec-pace');
+}
+
+// ---------- engagement ----------
+function renderEngagement(platforms, snaps){
+  const latest = snaps[snaps.length-1].platforms;
+  const ig = latest.instagram || {}, tt = latest.tiktok || {}, yt = latest.youtube || {};
+  const tiles = [];
+  const lpf = ratio(tt.likes, tt.followers);
+  if(lpf != null) tiles.push({hi:true, n: Math.round(lpf) + '×', k: 'TikTok likes per follower',
+    c: `${FMT(tt.likes)} likes from just ${FULL(tt.followers)} followers — content that travels far beyond the follower count.`});
+  const avg = ratio(yt.views, yt.videos);
+  if(avg != null) tiles.push({n: FMT(Math.round(avg)), k: 'Avg views per YouTube video',
+    c: `across ${FULL(yt.videos)} uploads`});
+  if(yt.views != null){
+    const vps = ratio(yt.views, yt.followers);
+    tiles.push({n: FMT(yt.views), k: 'Lifetime YouTube views',
+      c: vps != null ? `${FULL(Math.round(vps))} views for every subscriber` : ''});
+  }
+  const pieces = (ig.posts ?? 0) + (tt.videos ?? 0) + (yt.videos ?? 0);
+  if(pieces > 0) tiles.push({n: FULL(pieces), k: 'Content pieces published',
+    c: 'posts and videos across three platforms'});
+  if(!tiles.length) return;
+  document.getElementById('engage-tiles').innerHTML = tiles.map(t =>
+    `<div class="stile${t.hi ? ' hi' : ''}"><div class="n">${t.n}</div><div class="k">${t.k}</div><div class="c">${t.c}</div></div>`).join('');
+  show('sec-engage');
+}
+
+// ---------- recent content ----------
+function renderVideos(d){
+  const rv = d.recent_videos;
+  if(!rv || !rv.videos || !rv.videos.length) return;
+  const vids = rv.videos.slice().sort((a,b) => (b.views ?? -1) - (a.views ?? -1)).slice(0,8);
+  document.getElementById('vidlist').innerHTML = vids.map((v,i) => `
+    <div class="vidrow${i === 0 ? ' top' : ''}">
+      <div class="rank">${i+1}</div>
+      <div>
+        <div class="t"><a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}" target="_blank" rel="noopener">${escapeHtml(v.title)}</a></div>
+        <div class="meta">${ageOf(v.published)}</div>
+      </div>
+      <div class="v"><b>${v.views == null ? '—' : FULL(v.views)}</b>
+        <small>views${v.likes != null ? ' · ' + FULL(v.likes) + ' likes' : ''}</small></div>
+    </div>`).join('');
+  show('sec-videos');
+}
+
+// ---------- audience mix ----------
+function renderMix(platforms, snaps){
+  const latest = snaps[snaps.length-1];
+  const rows = platforms.map(p => ({p, val: (latest.platforms[p.id]||{}).followers}))
+    .filter(r => r.val != null && r.val > 0)
+    .sort((a,b) => b.val - a.val);
+  if(!rows.length) return;
+  const total = rows.reduce((s,r) => s + r.val, 0);
+  new Chart('c-mix', {
+    type: 'doughnut',
+    data: {labels: rows.map(r => r.p.name),
+      datasets: [{data: rows.map(r => r.val), backgroundColor: rows.map(r => r.p.color),
+        borderWidth: 2, borderColor: '#fff'}]},
+    options: {responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {legend: {display: false},
+        tooltip: {callbacks: {label: ctx => ` ${ctx.label}: ${FULL(ctx.parsed)} (${Math.round(100*ctx.parsed/total)}%)`}}}}
+  });
+  document.getElementById('mix-center').innerHTML =
+    `<div class="n">${FULL(total)}</div><div class="k">followers</div>`;
+  document.getElementById('mix-legend').innerHTML = rows.map(r =>
+    `<div class="mixrow"><span class="dot" style="background:${r.p.color}"></span>
+     <span class="nm">${r.p.name}</span><span class="ct">${FULL(r.val)}</span>
+     <span class="pc">${Math.round(100*r.val/total)}%</span></div>`).join('');
+  const top = rows[0];
+  document.getElementById('mix-takeaway').innerHTML =
+    `${top.p.name} is <b>${Math.round(100*top.val/total)}%</b> of total reach.`;
+  show('sec-mix');
+}
+
+// ---------- who we reach (demographics) ----------
+function renderDemographics(d){
+  const dm = d.demographics;
+  if(!dm || !dm.age || !dm.age.length) return;
+  const est = !!dm.estimated;
+  document.getElementById('demo-badge').classList.toggle('hidden', !est);
+  document.getElementById('demo-note').textContent =
+    (est ? 'Estimated audience profile' : 'Audience profile') +
+    (dm.as_of ? ' as of ' + prettyDate(dm.as_of) : '') +
+    (est ? ' — will be replaced with real platform analytics.' : '.');
+
+  const maxPct = Math.max(...dm.age.map(a => a.pct));
+  new Chart('c-age', {
+    type: 'bar',
+    data: {labels: dm.age.map(a => a.band),
+      datasets: [{data: dm.age.map(a => a.pct),
+        backgroundColor: dm.age.map(a => a.pct === maxPct ? '#FFC72C' : '#5d4380'),
+        borderRadius: 5}]},
+    options: {indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {legend: {display: false},
+        tooltip: {callbacks: {label: ctx => ' ' + ctx.parsed.x + '%'}}},
+      scales: {x: {grid: {color: '#efe9f6'}, ticks: {callback: v => v + '%'}},
+               y: {grid: {display: false}}}}
+  });
+
+  const gcolors = ['#5d4380', '#FFC72C', '#a29ab4'];
+  if(dm.gender && dm.gender.length){
+    document.getElementById('genderbar').innerHTML = dm.gender.map((g,i) =>
+      `<span style="width:${g.pct}%;background:${gcolors[i%3]}"></span>`).join('');
+    document.getElementById('genderlegend').innerHTML = dm.gender.map((g,i) =>
+      `<div class="glegend"><span class="dot" style="background:${gcolors[i%3]}"></span>
+       ${escapeHtml(g.label)}<span class="p">${g.pct}%</span></div>`).join('');
+  }
+  if(dm.locations && dm.locations.length){
+    const maxLoc = Math.max(...dm.locations.map(l => l.pct));
+    document.getElementById('loclist').innerHTML = dm.locations.map(l => `
+      <div class="locrow">
+        <div class="toprow"><b>${escapeHtml(l.name)}</b><span>${l.pct}%</span></div>
+        <div class="track"><div class="fill" style="width:${(100*l.pct/maxLoc).toFixed(0)}%"></div></div>
+      </div>`).join('');
+  }
+  show('sec-demo');
 }
 </script>
 </body>

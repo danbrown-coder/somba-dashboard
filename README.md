@@ -47,6 +47,40 @@ Two easy ways, both optional:
   **Run workflow**. It fetches fresh numbers and republishes in about a minute.
 - **On your Mac**: double-click **`weekly-update.command`** in this folder.
 
+## What the dashboard shows
+
+- **Total audience** — everyone following SOMBA anywhere, added together
+- **Platform cards** — followers per platform with week-over-week change
+- **Follower growth charts** — one per platform (appear after two weeks of data)
+- **Growth pace** — new followers per week, fastest-growing platform, and a
+  milestone projection ("Instagram passes 1,000 followers by ~…")
+- **Engagement** — likes per follower, average views per video, total content
+  published
+- **Recent content** — the latest YouTube uploads ranked by views (pulled from
+  YouTube's official public feed)
+- **Audience mix** — a donut chart of which platform holds how much of the
+  audience
+- **Who we reach** — age, gender, and location breakdown. **Right now these
+  are clearly-labeled estimates** (there's a gold "Estimated" badge on the
+  section) because platforms only show real demographics to the account owner
+  inside their apps. See below for swapping in the real numbers.
+
+## Replacing the estimated demographics with real numbers
+
+The age/gender/location numbers are placeholders until someone with access to
+the SOMBA accounts copies the real ones from the apps (about 10 minutes):
+
+1. In the Instagram app: **Professional dashboard → Total followers** shows
+   age ranges, gender, and top cities. TikTok: **Profile → TikTok Studio →
+   Analytics → Followers** shows the same.
+2. Open `data/stats.json` in any text editor and find `"demographics"`.
+3. Overtype the `pct` numbers with the real ones (each group should add up
+   to about 100).
+4. Change `"estimated": true` to `"estimated": false` and update `"as_of"`
+   to today's date.
+5. Save, then publish: double-click `weekly-update.command`, or ask
+   Claude Code to push. The gold "Estimated" badge disappears on its own.
+
 ## Adding Facebook later
 
 Open `data/stats.json`, find the Facebook entry, set its `"url"` to the page
