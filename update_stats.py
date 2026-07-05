@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.request
 from datetime import date
 
@@ -168,15 +169,37 @@ def last_known(prev_snap, platform_id):
     return entry, prev_snap["date"]
 
 
-def carry_forward(p, prev_snap):
+def last_known_any(data, platform_id):
+    """Newest non-null numbers for a platform from ANY snapshot — including
+    today's (a same-day rerun must never wipe a good number with a blank)."""
+    for snap in reversed(data["snapshots"]):
+        entry = (snap.get("platforms") or {}).get(platform_id)
+        if entry and entry.get("followers") is not None:
+            return entry, snap["date"]
+    return None, None
+
+
+def carry_forward(p, data):
     """Couldn't scrape — reuse the last known numbers, flagged as reused."""
-    prev_entry, prev_date = last_known(prev_snap, p["id"])
+    prev_entry, prev_date = last_known_any(data, p["id"])
     if prev_entry:
         out = {k: v for k, v in prev_entry.items() if k not in ("source", "carried_from")}
         out["source"] = "carried"
         out["carried_from"] = prev_entry.get("carried_from", prev_date)
         return out
     return {"followers": None, "source": "carried"}
+
+
+def fetch_with_retries(fetcher, p, attempts=3, delay=6):
+    """Platforms sometimes rate-limit cloud servers briefly — retry before
+    falling back to carry-forward."""
+    for i in range(attempts):
+        try:
+            return fetcher(p)
+        except Exception:
+            if i == attempts - 1:
+                raise
+            time.sleep(delay)
 
 
 # ---------------------------------------------------------------- snapshots
@@ -258,11 +281,11 @@ def main():
         sys.stdout.write("  %s... " % p["name"])
         sys.stdout.flush()
         try:
-            metrics = FETCHERS[p["id"]](p)
+            metrics = fetch_with_retries(FETCHERS[p["id"]], p)
             metrics["source"] = "scrape"
             print("ok (%s followers)" % "{:,}".format(metrics["followers"]))
         except Exception as e:
-            metrics = carry_forward(p, prev_snap)
+            metrics = carry_forward(p, data)
             note = "reused last number" if metrics.get("followers") is not None else "no data yet"
             print("could not read (%s) — %s" % (e, note))
         snap["platforms"][p["id"]] = metrics

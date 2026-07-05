@@ -65,8 +65,10 @@
       "date": "2026-07-05",
       "platforms": {
         "instagram": {
-          "followers": null,
-          "source": "carried"
+          "followers": 756,
+          "following": 285,
+          "posts": 512,
+          "source": "scrape"
         },
         "tiktok": {
           "followers": 151,
@@ -77,7 +79,7 @@
         "youtube": {
           "followers": 243,
           "videos": 222,
-          "views": 421115,
+          "views": 421136,
           "source": "scrape"
         },
         "linkedin": {
