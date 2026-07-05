@@ -234,6 +234,15 @@
   .task.done .box svg{opacity:1;transform:scale(1)}
   .task.done .tt{color:var(--purple-mid)}
   .task.done .tc{opacity:.65}
+  .pb-tool{display:flex;gap:13px;align-items:flex-start;margin-top:14px;
+    background:var(--gold-soft);border:1px solid #f1dfae;border-radius:14px;padding:15px 18px}
+  .pb-tool .ticon{flex:none;color:var(--gold-deep);margin-top:2px}
+  .pb-tool .ticon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;display:block}
+  .pb-tool .tk{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--gold-deep)}
+  .pb-tool .tb{font-size:13.5px;color:#5c5340;line-height:1.5;margin-top:2px}
+  .pb-tool a{font-weight:700;color:var(--purple-mid);text-decoration:none;white-space:nowrap}
+  .pb-tool a:hover{text-decoration:underline}
 
   /* ---- states / misc ---- */
   .empty{background:var(--card);border:1px dashed var(--border);border-radius:var(--r);
@@ -797,8 +806,10 @@ const PLAYBOOK = [
     {t:'Every ambassador adds SOMBA to their profile', c:'And follows the page — that alone reaches hundreds of connections.', f:'once'},
     {t:'One professional post a week', c:'Event recaps, internship wins, alumni spotlights — consistency beats volume here.', f:'weekly'},
     {t:'Use the page’s free invite credits', c:'LinkedIn grants monthly invites — aim them at SOM students and alumni.', f:'monthly'},
-    {t:'Tag the SOM and CLU pages', c:'Their followers see SOMBA in the conversation.', f:'every post'}
-  ]},
+    {t:'Tag the SOM and CLU pages', c:'Their followers see SOMBA in the conversation.', f:'every post'},
+    {t:'Scale outreach with Gatherdly', c:'Have it find SOM students & alumni and draft personalized connection invites — you approve every send.', f:'weekly'}
+  ], tool:{name:'Gatherdly', url:'https://gatherdly.app',
+    blurb:'An AI teammate that finds the right SOM students and alumni, drafts personal invites to connect and follow the SOMBA page, and queues them for your approval — outreach at scale without losing the personal touch.'}},
   {id:'facebook', name:'Facebook', role:'Optional — decide deliberately', stat:'not launched', actions:[
     {t:'Launch only if parents & alumni matter', c:'Students aren’t there. A dead page looks worse than no page.', f:'decide'},
     {t:'Auto-crosspost from Instagram', c:'If launched, Meta Business Suite mirrors every IG post for free — zero extra effort.', f:'setup once'}
@@ -855,7 +866,14 @@ function pbRender(){
           <span class="tc">${a.c}</span><br>
           <span class="fq">${a.f}</span></span>
       </button>`;
-    }).join('')}</div>`;
+    }).join('')}</div>
+    ${pf.tool ? `<div class="pb-tool">
+      <span class="ticon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg></span>
+      <span><span class="tk">Power tool — ${pf.tool.name}</span>
+        <div class="tb">${pf.tool.blurb}
+          <a href="${pf.tool.url}" target="_blank" rel="noopener">${pf.tool.url.replace('https://','')} →</a></div>
+      </span>
+    </div>` : ''}`;
   document.querySelectorAll('.task').forEach(el =>
     el.addEventListener('click', () => {
       const key = pf.id + ':' + el.dataset.i;
