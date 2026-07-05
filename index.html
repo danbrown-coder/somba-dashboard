@@ -6,125 +6,161 @@
 <title>SOMBA — Social Media Dashboard · Cal Lutheran School of Management</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233F2A56'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Georgia' font-weight='bold' fill='%23FFC72C' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
         integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF"
         crossorigin="anonymous"></script>
 <style>
   :root{
-    --bg:#f6f4f8; --card:#fff; --border:#e5e0ec; --ink:#292433;
-    --muted:#877f95; --label:#a29ab4;
-    --purple:#3F2A56; --purple-mid:#5d4380; --purple-soft:#efe9f6;
-    --gold:#FFC72C; --gold-deep:#b8860b; --gold-soft:#fff6dd;
-    --green:#3f8f63; --red:#bf4a33;
-    --shadow:0 1px 2px rgba(50,40,70,.05),0 6px 22px rgba(50,40,70,.06);
+    --bg:#f7f5fa; --card:#fff; --border:#e6e1ee; --ink:#241f2e;
+    --muted:#6e6680; --label:#8d84a3;
+    --purple:#3F2A56; --purple-deep:#2c1d40; --purple-mid:#5d4380; --purple-soft:#efe9f6;
+    --gold:#FFC72C; --gold-deep:#a87a08; --gold-soft:#fff6dd;
+    --green:#35795a; --red:#b34531;
+    --shadow-1:0 1px 2px rgba(50,40,70,.05),0 4px 14px rgba(50,40,70,.05);
+    --shadow-2:0 2px 4px rgba(50,40,70,.07),0 14px 34px rgba(50,40,70,.09);
+    --r:18px;
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:84px}
   body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    line-height:1.5;-webkit-font-smoothing:antialiased}
+    font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased}
   .serif{font-family:"Newsreader",Georgia,serif}
-  .wrap{max-width:1040px;margin:0 auto;padding:48px 24px 90px}
-  .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--label);font-weight:700;margin:0 0 10px}
-  h1{font-family:"Newsreader",serif;font-weight:600;font-size:52px;letter-spacing:-.02em;
-    margin:6px 0 6px;line-height:1.04}
+
+  /* ---- atmosphere ---- */
+  .bg-glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(900px 480px at 8% -6%, rgba(93,67,128,.14), transparent 62%),
+      radial-gradient(700px 420px at 96% -4%, rgba(255,199,44,.12), transparent 60%),
+      radial-gradient(760px 520px at 50% 108%, rgba(93,67,128,.07), transparent 60%)}
+  .bg-glow::after{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.28 0 0 0 0 0.23 0 0 0 0 0.36 0 0 0 .028 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:20px 24px 90px}
+
+  /* ---- sticky nav ---- */
+  .topnav{position:sticky;top:14px;z-index:50;display:flex;align-items:center;gap:18px;
+    max-width:1012px;margin:14px auto 0;padding:9px 12px 9px 16px;
+    background:rgba(255,255,255,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--border);border-radius:999px;box-shadow:var(--shadow-1)}
+  .topnav .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;
+    color:var(--purple);text-decoration:none;letter-spacing:.02em;flex:none}
+  .topnav .mono{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+    border-radius:8px;background:var(--purple);color:var(--gold);
+    font-family:"Newsreader",serif;font-weight:600;font-size:16px}
+  .topnav .links{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+  .topnav .links::-webkit-scrollbar{display:none}
+  .topnav .links a{padding:7px 13px;border-radius:999px;font-size:13.5px;font-weight:600;
+    color:var(--muted);text-decoration:none;white-space:nowrap;transition:color .2s,background .2s}
+  .topnav .links a:hover{color:var(--purple);background:var(--purple-soft)}
+  .topnav .links a.on{color:var(--purple);background:var(--purple-soft)}
+
+  /* ---- header ---- */
+  .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--gold-deep);font-weight:700;margin:38px 0 10px}
+  h1{font-family:"Newsreader",serif;font-weight:600;font-size:54px;letter-spacing:-.02em;
+    margin:6px 0 6px;line-height:1.03}
   h1 em{font-style:italic;color:var(--purple-mid)}
-  .sub{font-size:18px;color:#4c4557;max-width:720px}
+  .sub{font-size:17px;color:#4c4557;max-width:720px}
   .sub a{color:var(--purple-mid);font-weight:600;text-decoration:none;white-space:nowrap}
   .sub a:hover{text-decoration:underline}
   .gen{font-size:14px;color:var(--muted);margin-top:10px}
 
-  /* total audience hero */
-  .hero{background:var(--purple);color:#fff;border-radius:20px;box-shadow:var(--shadow);
-    padding:34px 38px;margin-top:30px;display:flex;align-items:baseline;gap:26px;flex-wrap:wrap}
-  .hero .k{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  /* ---- hero ---- */
+  .hero{position:relative;overflow:hidden;color:#fff;border-radius:22px;box-shadow:var(--shadow-2);
+    padding:36px 40px;margin-top:30px;display:flex;align-items:baseline;gap:26px;flex-wrap:wrap;
+    background:linear-gradient(135deg,var(--purple) 0%,var(--purple-deep) 78%)}
+  .hero::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.13) 1px, transparent 1.4px);
+    background-size:22px 22px}
+  .hero::after{content:"";position:absolute;right:-70px;top:-90px;width:280px;height:280px;
+    border-radius:50%;background:radial-gradient(circle, rgba(255,199,44,.22), transparent 68%);pointer-events:none}
+  .hero .k{position:relative;font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
     color:#cfc2e2;width:100%;margin-bottom:-8px}
-  .hero .v{font-family:"Newsreader",serif;font-size:74px;font-weight:600;letter-spacing:-.02em;
-    line-height:1;border-bottom:5px solid var(--gold);padding-bottom:8px}
-  .hero .d{font-size:17px;color:#e8e0f3}
+  .hero .v{position:relative;font-family:"Newsreader",serif;font-size:76px;font-weight:600;letter-spacing:-.02em;
+    line-height:1;border-bottom:5px solid var(--gold);padding-bottom:10px;font-variant-numeric:tabular-nums}
+  .hero .d{position:relative;font-size:16.5px;color:#e8e0f3}
   .hero .d b{color:var(--gold)}
 
-  /* platform cards */
+  /* ---- platform cards ---- */
   .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:22px 0 0}
-  .pcard{background:var(--card);border:1px solid var(--border);border-radius:16px;
-    padding:22px 24px;box-shadow:var(--shadow)}
+  .pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+    padding:22px 24px;box-shadow:var(--shadow-1);transition:transform .2s,box-shadow .2s}
+  .pcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+  .picon{display:inline-flex;flex:none}
+  .picon svg{width:17px;height:17px;fill:currentColor;display:block}
   .pcard .head{display:flex;align-items:center;gap:9px}
-  .pcard .dot{width:11px;height:11px;border-radius:50%;flex:none}
-  .pcard .name{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700}
-  .pcard .name a{color:inherit;text-decoration:none}
+  .pcard .name{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pcard .name a{color:inherit;text-decoration:none;transition:color .2s}
   .pcard .name a:hover{color:var(--purple-mid)}
   .pcard .row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
   .pcard .v{font-family:"Newsreader",serif;font-size:44px;font-weight:600;letter-spacing:-.02em;margin-top:4px}
-  .pcard .v small{font-size:18px;color:var(--muted);font-weight:500;margin-left:6px}
-  .pill{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:3px 11px}
-  .pill.up{background:#eef6f0;color:var(--green)}
+  .pcard .v small{font-size:17px;color:var(--muted);font-weight:500;margin-left:6px;font-family:"Instrument Sans",sans-serif}
+  .pill{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:3px 11px}
+  .pill.up{background:#e9f4ee;color:var(--green)}
   .pill.down{background:#faefec;color:var(--red)}
   .pill.flat{background:#f0edf4;color:var(--muted)}
   .pill.stale{background:var(--gold-soft);color:var(--gold-deep)}
   .pcard .extras{font-size:14px;color:var(--muted);margin-top:8px}
 
-  /* section card */
-  section{background:var(--card);border:1px solid var(--border);border-radius:18px;
-    padding:30px 32px;box-shadow:var(--shadow);margin-top:22px}
-  section h2{font-family:"Newsreader",serif;font-weight:600;font-size:30px;
+  /* ---- sections ---- */
+  section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+    padding:32px 34px;box-shadow:var(--shadow-1);margin-top:24px}
+  .kicker{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold-deep);font-weight:700;margin:0 0 6px}
+  section h2{font-family:"Newsreader",serif;font-weight:600;font-size:31px;
     letter-spacing:-.01em;margin:0 0 4px}
   section .note{font-size:15px;color:var(--muted);margin:0 0 20px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
   .chart-box{position:relative;height:260px}
   .chart-box.tall{height:320px}
-  .chart-title{font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  .chart-box.short{height:220px}
+  .chart-title{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--label);font-weight:700;margin:0 0 8px}
 
-  /* empty / notice states */
-  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;
-    padding:46px 40px;text-align:center;box-shadow:var(--shadow);margin-top:26px}
-  .empty h2{font-family:"Newsreader",serif;font-size:30px;margin:0 0 12px}
-  .empty p{color:#4c4557;max-width:560px;margin:0 auto 10px}
-  .empty code{background:var(--purple-soft);padding:3px 9px;border-radius:6px;font-size:15px}
-  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--purple-soft);color:var(--purple-mid);
-    border:1px solid #ddd2ea;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
-  .hidden{display:none}
-
-  /* insight stat tiles */
+  /* ---- stat tiles ---- */
   .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .stile{border:1px solid var(--border);border-radius:14px;padding:18px 20px;background:#fbfafc}
+  .stile{border:1px solid var(--border);border-radius:14px;padding:18px 20px;background:#fcfbfd;
+    transition:transform .2s,box-shadow .2s}
+  .stile:hover{transform:translateY(-2px);box-shadow:var(--shadow-1)}
   .stile .n{font-family:"Newsreader",serif;font-size:38px;font-weight:600;letter-spacing:-.02em}
-  .stile .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700;margin-top:2px}
-  .stile .c{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .stile .k{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:700;margin-top:2px}
+  .stile .c{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45}
   .stile.hi{border-top:4px solid var(--gold);background:var(--gold-soft)}
   .milestone{font-family:"Newsreader",serif;font-size:22px;margin:18px 0 0;line-height:1.35}
   .milestone b{color:var(--purple-mid)}
-  /* recent videos list */
+
+  /* ---- recent videos ---- */
   .vidrow{display:grid;grid-template-columns:30px 1fr auto;gap:14px;align-items:center;
-    padding:11px 8px;border-bottom:1px solid var(--border);border-radius:8px}
+    padding:11px 10px;border-bottom:1px solid var(--border);border-radius:10px;transition:background .2s}
   .vidrow:last-child{border-bottom:0}
   .vidrow:hover{background:var(--purple-soft)}
   .vidrow.top{background:var(--gold-soft)}
   .vidrow .rank{font-family:"Newsreader",serif;font-size:20px;color:var(--label);text-align:center}
   .vidrow .t{font-size:15px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .vidrow .t a{color:var(--ink);text-decoration:none}
+  .vidrow .t a{color:var(--ink);text-decoration:none;transition:color .2s}
   .vidrow .t a:hover{color:var(--purple-mid)}
   .vidrow .meta{font-size:12.5px;color:var(--muted);margin-top:1px}
   .vidrow .v{text-align:right;font-variant-numeric:tabular-nums}
   .vidrow .v b{font-size:16px}
   .vidrow .v small{display:block;font-size:12px;color:var(--muted)}
-  /* audience mix donut */
+
+  /* ---- audience mix ---- */
   .donut-wrap{position:relative;height:300px}
   .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
   .donut-center .n{font-family:"Newsreader",serif;font-size:40px;font-weight:600}
   .donut-center .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--label);font-weight:700}
-  .mixrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:15px}
+  .mixrow{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);font-size:15px}
   .mixrow:last-child{border-bottom:0}
-  .mixrow .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .mixrow .picon svg{width:15px;height:15px}
   .mixrow .nm{font-weight:600;flex:1}
   .mixrow .ct{color:var(--muted);font-variant-numeric:tabular-nums}
   .mixrow .pc{width:52px;text-align:right;font-weight:700;color:var(--purple-mid);font-variant-numeric:tabular-nums}
-  /* demographics */
-  .sec-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
-  .sec-head h2{margin:0}
+
+  /* ---- demographics ---- */
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px}
-  .chart-box.short{height:220px}
   .splitbar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:10px 0 12px}
   .splitbar span{height:100%}
   .glegend{display:flex;align-items:center;gap:8px;font-size:14px;padding:4px 0}
@@ -137,36 +173,118 @@
   .locrow .track{height:9px;background:var(--purple-soft);border-radius:5px;overflow:hidden}
   .locrow .fill{height:100%;background:linear-gradient(90deg,var(--purple-mid),var(--purple));border-radius:5px}
 
-  /* growth strategy */
-  .thesis{font-family:"Newsreader",serif;font-size:21px;line-height:1.45;max-width:820px;margin:0 0 8px}
+  /* ---- playbook ---- */
+  .pb-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .pb-total{margin-left:auto;font-size:13.5px;font-weight:700;color:var(--purple-mid);
+    background:var(--purple-soft);border-radius:999px;padding:6px 14px}
+  .thesis{font-family:"Newsreader",serif;font-size:21px;line-height:1.45;max-width:860px;margin:4px 0 18px}
   .thesis b{color:var(--purple-mid)}
-  .playbook{background:var(--purple);color:#fff;border-radius:16px;padding:22px 26px;margin:18px 0 8px}
-  .playbook .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#cfc2e2;margin-bottom:6px}
-  .playbook .flow{font-family:"Newsreader",serif;font-size:22px;font-weight:600}
-  .playbook .flow em{font-style:normal;color:var(--gold)}
-  .playbook p{margin:8px 0 0;font-size:14px;color:#e8e0f3;line-height:1.5}
-  .strat{padding:20px 0;border-bottom:1px solid var(--border)}
-  .strat:last-child{border-bottom:0;padding-bottom:4px}
-  .strat .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .strat .head .dot{width:11px;height:11px;border-radius:50%;flex:none;align-self:center}
-  .strat h3{font-family:"Newsreader",serif;font-size:23px;font-weight:600;margin:0}
-  .strat .role{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--label);font-weight:700}
-  .strat .why{font-size:15px;color:#4c4557;margin:8px 0 10px;max-width:820px}
-  .strat ul{margin:0;padding-left:22px}
-  .strat li{font-size:15px;margin:6px 0;line-height:1.5}
-  .strat li b{color:var(--purple-mid)}
+  .pipeline{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--purple),var(--purple-deep));
+    color:#fff;border-radius:16px;padding:22px 26px;margin:0 0 22px}
+  .pipeline::before{content:"";position:absolute;inset:0;opacity:.45;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.12) 1px, transparent 1.4px);background-size:20px 20px}
+  .pipeline .k{position:relative;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#cfc2e2;margin-bottom:12px}
+  .flowrow{position:relative;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .fchip{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:9px 16px;font-weight:600;font-size:14.5px}
+  .fchip svg{width:16px;height:16px;fill:currentColor;display:block}
+  .fchip.src{background:var(--gold);border-color:var(--gold);color:var(--purple-deep)}
+  .fchip.src svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .farrow{color:var(--gold);flex:none}
+  .farrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;display:block}
+  .pipeline p{position:relative;margin:12px 0 0;font-size:13.5px;color:#dcd2ea;max-width:640px;line-height:1.5}
 
-  footer{margin-top:46px;text-align:center;font-size:14px;color:var(--muted)}
+  .pb-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 14px;scrollbar-width:none}
+  .pb-tabs::-webkit-scrollbar{display:none}
+  .pb-tab{display:inline-flex;align-items:center;gap:9px;flex:none;cursor:pointer;
+    background:#fcfbfd;border:1.5px solid var(--border);border-radius:999px;padding:10px 16px;
+    font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);
+    transition:color .2s,border-color .2s,background .2s,box-shadow .2s}
+  .pb-tab svg{width:15px;height:15px;fill:currentColor;display:block}
+  .pb-tab .cnt{font-size:12px;font-weight:700;background:var(--purple-soft);color:var(--purple-mid);
+    border-radius:999px;padding:2px 8px;transition:background .2s,color .2s}
+  .pb-tab:hover{border-color:var(--purple-mid);color:var(--purple)}
+  .pb-tab.on{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:var(--shadow-1)}
+  .pb-tab.on .cnt{background:rgba(255,255,255,.16);color:var(--gold)}
+  .pb-tab.done .cnt{background:var(--gold);color:var(--purple-deep)}
+
+  .pb-panel{border:1px solid var(--border);border-radius:16px;padding:22px 24px;background:#fcfbfd}
+  .pb-role{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .pb-role .r{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--label)}
+  .pb-stat{font-size:13px;font-weight:700;color:var(--gold-deep);background:var(--gold-soft);
+    border-radius:999px;padding:4px 12px}
+  .pb-bar{height:8px;background:var(--purple-soft);border-radius:5px;overflow:hidden;margin:14px 0 18px}
+  .pb-bar .fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#f5b400);border-radius:5px;
+    transition:width .35s ease}
+  .todo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .task{display:flex;gap:13px;align-items:flex-start;cursor:pointer;text-align:left;font-family:inherit;
+    background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:15px 16px;
+    transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+  .task:hover{border-color:var(--purple-mid);transform:translateY(-1px);box-shadow:var(--shadow-1)}
+  .task .box{flex:none;width:22px;height:22px;margin-top:1px;border-radius:7px;border:2px solid var(--label);
+    display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+  .task .box svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+    opacity:0;transform:scale(.5);transition:opacity .2s,transform .2s}
+  .task .tt{font-size:15px;font-weight:700;line-height:1.3}
+  .task .tc{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .task .fq{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--purple-mid);background:var(--purple-soft);border-radius:999px;padding:2px 9px}
+  .task.done{background:var(--purple-soft);border-color:transparent}
+  .task.done .box{background:var(--purple);border-color:var(--purple)}
+  .task.done .box svg{opacity:1;transform:scale(1)}
+  .task.done .tt{color:var(--purple-mid)}
+  .task.done .tc{opacity:.65}
+
+  /* ---- states / misc ---- */
+  .empty{background:var(--card);border:1px dashed var(--border);border-radius:var(--r);
+    padding:46px 40px;text-align:center;box-shadow:var(--shadow-1);margin-top:26px}
+  .empty h2{font-family:"Newsreader",serif;font-size:30px;margin:0 0 12px}
+  .empty p{color:#4c4557;max-width:560px;margin:0 auto 10px}
+  .empty code{background:var(--purple-soft);padding:3px 9px;border-radius:6px;font-size:15px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--purple-soft);color:var(--purple-mid);
+    border:1px solid #ddd2ea;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
+  .hidden{display:none}
+  a,button{cursor:pointer}
+  :focus-visible{outline:2px solid var(--gold-deep);outline-offset:2px;border-radius:6px}
+
+  footer{margin-top:52px;text-align:center;font-size:14px;color:var(--muted)}
+  footer .fmono{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+    border-radius:10px;background:var(--purple);color:var(--gold);
+    font-family:"Newsreader",serif;font-weight:600;font-size:19px;margin-bottom:10px}
   footer b{color:var(--purple-mid)}
+
+  /* ---- motion (opt-in via JS; content always visible without it) ---- */
+  @media (prefers-reduced-motion: no-preference){
+    .rise{animation:rise .6s cubic-bezier(.22,.9,.36,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  }
+
   @media(max-width:760px){
     .cards{grid-template-columns:1fr} .grid2{grid-template-columns:1fr}
     .statgrid{grid-template-columns:repeat(2,1fr)} .grid3{grid-template-columns:1fr}
-    h1{font-size:38px} .hero .v{font-size:54px}
+    .todo{grid-template-columns:1fr}
+    h1{font-size:38px} .hero .v{font-size:56px} .hero{padding:28px 26px}
+    section{padding:24px 20px}
+    .topnav{top:10px}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="bg-glow" aria-hidden="true"></div>
+
+<nav class="topnav" aria-label="Sections">
+  <a class="brand" href="#top"><span class="mono">S</span>SOMBA</a>
+  <div class="links" id="navlinks">
+    <a href="#overview">Overview</a>
+    <a href="#growth">Growth</a>
+    <a href="#engagement">Engagement</a>
+    <a href="#content">Content</a>
+    <a href="#audience">Audience</a>
+    <a href="#playbook">Playbook</a>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
   <div class="eyebrow">SOMBA · Social Media</div>
   <h1 class="serif">Brand Ambassadors, <em>by the numbers</em></h1>
   <p class="sub" id="links">Follower growth across every SOMBA channel, updated weekly.</p>
@@ -182,182 +300,157 @@
   </div>
 
   <div id="report" class="hidden">
-    <div class="hero">
-      <div class="k">Total audience — all platforms</div>
-      <div class="v" id="hero-total"></div>
-      <div class="d" id="hero-delta"></div>
+    <div id="overview">
+      <div class="hero">
+        <div class="k">Total audience — all platforms</div>
+        <div class="v" id="hero-total"></div>
+        <div class="d" id="hero-delta"></div>
+      </div>
+      <div class="cards" id="cards"></div>
     </div>
 
-    <div class="cards" id="cards"></div>
+    <div id="growth">
+      <section id="sec-charts" class="hidden">
+        <div class="kicker">Trajectory</div>
+        <h2 class="serif">Follower growth</h2>
+        <p class="note">Each platform on its own scale, so small accounts still show their trend.</p>
+        <div class="grid2" id="chartgrid"></div>
+      </section>
 
-    <section id="sec-charts" class="hidden">
-      <h2 class="serif">Follower growth</h2>
-      <p class="note">Each platform on its own scale, so small accounts still show their trend.</p>
-      <div class="grid2" id="chartgrid"></div>
-    </section>
+      <section id="sec-total-chart" class="hidden">
+        <div class="kicker">Trajectory</div>
+        <h2 class="serif">Total audience over time</h2>
+        <p class="note">Everyone following SOMBA anywhere, added together.</p>
+        <div class="chart-box tall"><canvas id="c-total"></canvas></div>
+      </section>
 
-    <section id="sec-total-chart" class="hidden">
-      <h2 class="serif">Total audience over time</h2>
-      <p class="note">Everyone following SOMBA anywhere, added together.</p>
-      <div class="chart-box tall"><canvas id="c-total"></canvas></div>
-    </section>
+      <div id="charts-soon" class="empty hidden">
+        <span class="badge">● Charts coming soon</span>
+        <h2 class="serif">Growth charts appear after next week's update</h2>
+        <p>One data point makes a dot, two make a line. The numbers refresh
+           automatically every Monday, and the growth charts — and milestone
+           projections — will draw themselves.</p>
+      </div>
 
-    <div id="charts-soon" class="empty hidden">
-      <span class="badge">● Charts coming soon</span>
-      <h2 class="serif">Growth charts appear after next week's update</h2>
-      <p>One data point makes a dot, two make a line. The numbers refresh
-         automatically every Monday, and the growth charts — and milestone
-         projections — will draw themselves.</p>
+      <section id="sec-pace" class="hidden">
+        <div class="kicker">Momentum</div>
+        <h2 class="serif">Growth pace</h2>
+        <p class="note">Average weekly change, measured across every snapshot.</p>
+        <div class="statgrid" id="pace-tiles"></div>
+        <p class="milestone" id="milestone"></p>
+      </section>
     </div>
 
-    <section id="sec-pace" class="hidden">
-      <h2 class="serif">Growth pace</h2>
-      <p class="note">Average weekly change, measured across every snapshot.</p>
-      <div class="statgrid" id="pace-tiles"></div>
-      <p class="milestone" id="milestone"></p>
-    </section>
+    <div id="engagement">
+      <section id="sec-engage" class="hidden">
+        <div class="kicker">Pulse</div>
+        <h2 class="serif">Engagement</h2>
+        <p class="note">What the audience does, not just how big it is.</p>
+        <div class="statgrid" id="engage-tiles"></div>
+      </section>
+    </div>
 
-    <section id="sec-engage" class="hidden">
-      <h2 class="serif">Engagement</h2>
-      <p class="note">What the audience does, not just how big it is.</p>
-      <div class="statgrid" id="engage-tiles"></div>
-    </section>
+    <div id="content">
+      <section id="sec-videos" class="hidden">
+        <div class="kicker">On screen</div>
+        <h2 class="serif">Recent content</h2>
+        <p class="note">The most recent YouTube uploads, ranked by views. Hashtag titles are Shorts.</p>
+        <div id="vidlist"></div>
+      </section>
+    </div>
 
-    <section id="sec-videos" class="hidden">
-      <h2 class="serif">Recent content</h2>
-      <p class="note">The most recent YouTube uploads, ranked by views. Hashtag titles are Shorts.</p>
-      <div id="vidlist"></div>
-    </section>
-
-    <section id="sec-mix" class="hidden">
-      <h2 class="serif">Audience mix</h2>
-      <p class="note">Where the total audience lives.</p>
-      <div class="grid2">
-        <div class="donut-wrap"><canvas id="c-mix"></canvas><div class="donut-center" id="mix-center"></div></div>
-        <div>
-          <div id="mix-legend"></div>
-          <p class="milestone" id="mix-takeaway"></p>
+    <div id="audience">
+      <section id="sec-mix" class="hidden">
+        <div class="kicker">Reach</div>
+        <h2 class="serif">Audience mix</h2>
+        <p class="note">Where the total audience lives.</p>
+        <div class="grid2">
+          <div class="donut-wrap"><canvas id="c-mix"></canvas><div class="donut-center" id="mix-center"></div></div>
+          <div>
+            <div id="mix-legend"></div>
+            <p class="milestone" id="mix-takeaway"></p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="sec-demo" class="hidden">
-      <h2 class="serif">Who we reach</h2>
-      <p class="note" id="demo-note"></p>
-      <div class="grid3">
-        <div>
-          <div class="chart-title">Age</div>
-          <div class="chart-box short"><canvas id="c-age"></canvas></div>
+      <section id="sec-demo" class="hidden">
+        <div class="kicker">Reach</div>
+        <h2 class="serif">Who we reach</h2>
+        <p class="note" id="demo-note"></p>
+        <div class="grid3">
+          <div>
+            <div class="chart-title">Age</div>
+            <div class="chart-box short"><canvas id="c-age"></canvas></div>
+          </div>
+          <div>
+            <div class="chart-title">Gender</div>
+            <div class="splitbar" id="genderbar"></div>
+            <div id="genderlegend"></div>
+          </div>
+          <div>
+            <div class="chart-title">Top locations</div>
+            <div id="loclist"></div>
+          </div>
         </div>
-        <div>
-          <div class="chart-title">Gender</div>
-          <div class="splitbar" id="genderbar"></div>
-          <div id="genderlegend"></div>
+      </section>
+    </div>
+
+    <div id="playbook">
+      <section id="sec-strategy">
+        <div class="pb-head">
+          <div>
+            <div class="kicker">Action plan</div>
+            <h2 class="serif">The growth playbook</h2>
+          </div>
+          <span class="pb-total" id="pb-total"></span>
         </div>
-        <div>
-          <div class="chart-title">Top locations</div>
-          <div id="loclist"></div>
+        <p class="thesis"><b>Instagram is the anchor</b>, <b>TikTok is the reach engine</b>,
+          <b>YouTube is the search asset</b>, and <b>LinkedIn is wide-open ground</b> for a school
+          of management. The job: convert reach into followers — without tripling the workload.</p>
+
+        <div class="pipeline">
+          <div class="k">The core workflow — one filming session feeds three platforms</div>
+          <div class="flowrow" id="flowrow"></div>
+          <p>Every vertical video SOMBA already makes is also a Reel and a Short.
+             Reach triples; effort doesn't. Tap the actions below to track what's live.</p>
         </div>
-      </div>
-    </section>
 
-    <section id="sec-strategy">
-      <h2 class="serif">Growth strategy</h2>
-      <p class="note">How SOMBA grows as a whole — and what each platform's job is.</p>
-
-      <p class="thesis">The numbers point to one playbook: <b>Instagram is the anchor</b> (two-thirds
-        of the audience), <b>TikTok is the reach engine</b> (13.8K likes from 151 followers — the
-        content already travels far beyond the follower base), <b>YouTube has proven demand</b>
-        (421K lifetime views, ~1,700 views for every subscriber), and
-        <b>LinkedIn is wide-open ground</b> for a school of management. The job now is converting
-        reach into followers — and doing it without tripling the workload.</p>
-
-      <div class="playbook">
-        <div class="k">The core workflow</div>
-        <div class="flow">Film once → post three times: <em>TikTok → Instagram Reel → YouTube Short</em></div>
-        <p>Every vertical video SOMBA already makes for TikTok is also a Reel and a Short.
-           One filming session feeds three platforms — reach triples, effort doesn't.</p>
-      </div>
-
-      <div class="strat">
-        <div class="head"><span class="dot" style="background:#C13584"></span>
-          <h3>Instagram</h3><span class="role">The anchor — deepen it</span></div>
-        <p class="why">756 followers and 512 posts make this the established home base. Growth here
-           comes from borrowed audiences and showing up consistently in Reels.</p>
-        <ul>
-          <li><b>3 Reels a week</b> — reuse the TikTok edits as-is; Reels is where Instagram hands out free reach.</li>
-          <li><b>Collab posts</b> with Cal Lutheran's main account, student orgs, and featured students — a collab post lands in both audiences' feeds and is the fastest borrow of an existing following.</li>
-          <li><b>Stories on event days</b> — polls, countdowns, and "tap to RSVP" stickers keep SOMBA at the top of the app for followers who miss posts.</li>
-          <li><b>Handle everywhere</b> — @somambassadors and a QR code on every flyer, slide deck, and event check-in table.</li>
-        </ul>
-      </div>
-
-      <div class="strat">
-        <div class="head"><span class="dot" style="background:#00B4C5"></span>
-          <h3>TikTok</h3><span class="role">The reach engine — convert it</span></div>
-        <p class="why">91 likes per follower means the For You feed already loves this content —
-           strangers watch it, they just don't follow yet. The gap between 13.8K likes and
-           151 followers is the single biggest free win on this dashboard.</p>
-        <ul>
-          <li><b>End every video with a reason to follow</b> — "follow for CLU business life" beats a generic outro; viewers follow accounts that promise a series, not single videos.</li>
-          <li><b>Make it a series</b> — "Day in the life of a SOM major," "Internship diaries," "Professor hot takes." Series turn one-time viewers into followers waiting for the next episode.</li>
-          <li><b>Reply-to-comment videos</b> — TikTok boosts them, and they signal an account worth following.</li>
-          <li><b>Ride trending sounds within 48 hours</b> — the current library of 440 videos shows the volume is there; timing is the lever.</li>
-        </ul>
-      </div>
-
-      <div class="strat">
-        <div class="head"><span class="dot" style="background:#CC0000"></span>
-          <h3>YouTube</h3><span class="role">The search asset — make it findable</span></div>
-        <p class="why">421K views against 243 subscribers means people arrive through Shorts and
-           search, watch, and leave. The channel earns attention; it needs to keep it.</p>
-        <ul>
-          <li><b>3 Shorts a week</b> from the TikTok pipeline — zero extra filming.</li>
-          <li><b>Searchable titles, not hashtag strings</b> — "Cal Lutheran business school day in the life" gets found for years; "#fyp #viral" gets found by no one.</li>
-          <li><b>Playlists per series</b> — binge-watching a playlist is what converts a viewer into a subscriber.</li>
-          <li><b>Pinned comment on every Short</b> linking the Instagram — send YouTube's drive-by traffic to the anchor platform.</li>
-        </ul>
-      </div>
-
-      <div class="strat">
-        <div class="head"><span class="dot" style="background:#0A66C2"></span>
-          <h3>LinkedIn</h3><span class="role">The whitespace — plant the flag</span></div>
-        <p class="why">3 followers at a school of management is the biggest mismatch on this page —
-           and the easiest to fix, because the ambassadors themselves are the distribution.</p>
-        <ul>
-          <li><b>Every ambassador lists SOMBA</b> as experience on their profile and follows the page — that alone puts the page in front of hundreds of connections.</li>
-          <li><b>One professional post a week</b> — event recaps, internship wins, alumni spotlights. LinkedIn rewards consistency over volume.</li>
-          <li><b>Use the page's invite credits</b> — LinkedIn gives company pages free connection invites every month; aim them at SOM students and alumni.</li>
-          <li><b>Tag the School of Management</b> and Cal Lutheran pages so their followers see SOMBA in the conversation.</li>
-        </ul>
-      </div>
-
-      <div class="strat">
-        <div class="head"><span class="dot" style="background:#1877F2"></span>
-          <h3>Facebook</h3><span class="role">Optional — decide deliberately</span></div>
-        <p class="why">Students aren't there, but parents and alumni are. Worth launching only if
-           those audiences matter to the program's goals.</p>
-        <ul>
-          <li><b>If launched, automate it</b> — Meta Business Suite can cross-post every Instagram post to Facebook automatically, so it costs zero extra effort.</li>
-          <li><b>Until then, skip it</b> — a dead page looks worse than no page.</li>
-        </ul>
-      </div>
-    </section>
+        <div class="pb-tabs" id="pb-tabs" role="tablist" aria-label="Platforms"></div>
+        <div class="pb-panel" id="pb-panel"></div>
+      </section>
+    </div>
   </div>
 
-  <footer>Cal Lutheran School of Management · <b>SOMBA</b> Brand Ambassador Program<br>
-    <span style="font-size:13px">Updates automatically every Monday</span></footer>
+  <footer>
+    <div><span class="fmono">S</span></div>
+    Cal Lutheran School of Management · <b>SOMBA</b> Brand Ambassador Program<br>
+    <span style="font-size:13px">Updates automatically every Monday</span>
+  </footer>
 </div>
 
 <script>
 const FULL = n => (n??0).toLocaleString();
 const FMT = n => n>=10000 ? (n/1000).toFixed(n>=100000?0:1).replace(/\.0$/,'')+'K' : FULL(n);
-Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
-Chart.defaults.color = '#877f95';
+Chart.defaults.font.family = "'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+Chart.defaults.color = '#6e6680';
 Chart.defaults.font.size = 13;
 Chart.defaults.animation = false;   // static report — draw fully, instantly
 
 const EXTRA_LABELS = {posts:'posts', following:'following', likes:'likes', videos:'videos', views:'views'};
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Brand marks (Simple Icons paths, 24x24)
+const ICONS = {
+  instagram:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793 0 1.44.645 1.44 1.439z"/></svg>',
+  tiktok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+  youtube:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+  linkedin:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>',
+  facebook:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>'
+};
+const CAMERA_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>';
+const ARROW_ICON  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const CHECK_ICON  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+const icon = id => `<span class="picon">${ICONS[id]||''}</span>`;
 
 const prettyDate = iso => new Date(iso + 'T12:00:00')
   .toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -410,7 +503,7 @@ function render(d){
     if(latest && prev){ prevTotal += prev.val; havePrev = true; }
     else if(latest){ prevTotal += latest.val; }
   });
-  document.getElementById('hero-total').textContent = FULL(total);
+  countUp(document.getElementById('hero-total'), total);
   document.getElementById('hero-delta').innerHTML = havePrev
     ? (total-prevTotal === 0 ? 'no change since the last update'
        : `<b>${total-prevTotal>0?'+':''}${FULL(total-prevTotal)}</b> since the last update`)
@@ -427,7 +520,7 @@ function render(d){
       .filter(k => entry[k] != null)
       .map(k => `${FMT(entry[k])} ${EXTRA_LABELS[k]||k}`).join(' · ');
     return `<div class="pcard">
-      <div class="head"><span class="dot" style="background:${p.color}"></span>
+      <div class="head"><span class="picon" style="color:${p.color}">${ICONS[p.id]||''}</span>
         <span class="name"><a href="${p.url||'#'}" target="_blank" rel="noopener">${p.name}${p.handle ? ' · '+p.handle : ''}</a></span></div>
       <div class="row">
         <div class="v">${followers==null ? '—' : FULL(followers)}<small>followers</small></div>
@@ -449,6 +542,9 @@ function render(d){
   try{ renderVideos(d); }catch(e){}
   try{ renderMix(platforms, snaps); }catch(e){}
   try{ renderDemographics(d); }catch(e){}
+  try{ initPlaybook(); }catch(e){}
+  initMotion();
+  initNav();
 }
 
 function renderHistoryCharts(platforms, snaps){
@@ -625,7 +721,7 @@ function renderMix(platforms, snaps){
   document.getElementById('mix-center').innerHTML =
     `<div class="n">${FULL(total)}</div><div class="k">followers</div>`;
   document.getElementById('mix-legend').innerHTML = rows.map(r =>
-    `<div class="mixrow"><span class="dot" style="background:${r.p.color}"></span>
+    `<div class="mixrow"><span class="picon" style="color:${r.p.color}">${ICONS[r.p.id]||''}</span>
      <span class="nm">${r.p.name}</span><span class="ct">${FULL(r.val)}</span>
      <span class="pc">${Math.round(100*r.val/total)}%</span></div>`).join('');
   const top = rows[0];
@@ -675,6 +771,134 @@ function renderDemographics(d){
       </div>`).join('');
   }
   show('sec-demo');
+}
+
+// ---------- the growth playbook (interactive, tracked in this browser) ----------
+const PLAYBOOK = [
+  {id:'instagram', name:'Instagram', role:'The anchor — deepen it', stat:'66% of total audience', actions:[
+    {t:'Post 3 Reels a week', c:'Reuse the TikTok edits as-is — Reels is where Instagram hands out free reach.', f:'3×/wk'},
+    {t:'Run collab posts with CLU accounts', c:'A collab lands in both audiences’ feeds — the fastest way to borrow a following.', f:'2×/mo'},
+    {t:'Stories on every event day', c:'Polls, countdowns, and RSVP stickers keep SOMBA at the top of the app.', f:'event days'},
+    {t:'Handle + QR on every flyer', c:'@somambassadors on each flyer, slide deck, and check-in table.', f:'always'}
+  ]},
+  {id:'tiktok', name:'TikTok', role:'The reach engine — convert it', stat:'91× likes per follower', actions:[
+    {t:'End every video with a follow prompt', c:'“Follow for CLU business life” — viewers follow accounts that promise a series.', f:'every post'},
+    {t:'Launch a weekly series', c:'“Day in the life of a SOM major,” “Internship diaries” — series turn viewers into followers.', f:'weekly'},
+    {t:'Reply to comments with videos', c:'TikTok boosts them, and they make the account feel alive.', f:'weekly'},
+    {t:'Jump trends within 48 hours', c:'The volume is there (440 videos) — timing is the lever.', f:'48h'}
+  ]},
+  {id:'youtube', name:'YouTube', role:'The search asset — make it findable', stat:'~1,700 views per subscriber', actions:[
+    {t:'Post 3 Shorts a week', c:'Straight from the TikTok pipeline — zero extra filming.', f:'3×/wk'},
+    {t:'Rewrite titles with search keywords', c:'“Cal Lutheran business school day in the life” gets found for years; hashtag strings don’t.', f:'every post'},
+    {t:'Group series into playlists', c:'Binge-watching a playlist is what converts a viewer into a subscriber.', f:'once'},
+    {t:'Pin a comment linking Instagram', c:'Send YouTube’s drive-by traffic to the anchor platform.', f:'every post'}
+  ]},
+  {id:'linkedin', name:'LinkedIn', role:'The whitespace — plant the flag', stat:'3 followers ↔ a whole b-school network', actions:[
+    {t:'Every ambassador adds SOMBA to their profile', c:'And follows the page — that alone reaches hundreds of connections.', f:'once'},
+    {t:'One professional post a week', c:'Event recaps, internship wins, alumni spotlights — consistency beats volume here.', f:'weekly'},
+    {t:'Use the page’s free invite credits', c:'LinkedIn grants monthly invites — aim them at SOM students and alumni.', f:'monthly'},
+    {t:'Tag the SOM and CLU pages', c:'Their followers see SOMBA in the conversation.', f:'every post'}
+  ]},
+  {id:'facebook', name:'Facebook', role:'Optional — decide deliberately', stat:'not launched', actions:[
+    {t:'Launch only if parents & alumni matter', c:'Students aren’t there. A dead page looks worse than no page.', f:'decide'},
+    {t:'Auto-crosspost from Instagram', c:'If launched, Meta Business Suite mirrors every IG post for free — zero extra effort.', f:'setup once'}
+  ]}
+];
+const PB_KEY = 'somba-playbook-v1';
+let pbState = {};
+try{ pbState = JSON.parse(localStorage.getItem(PB_KEY) || '{}'); }catch(e){ pbState = {}; }
+let pbActive = PLAYBOOK[0].id;
+
+function pbSave(){ try{ localStorage.setItem(PB_KEY, JSON.stringify(pbState)); }catch(e){} }
+function pbCount(pf){ return pf.actions.reduce((s,_,i) => s + (pbState[pf.id+':'+i] ? 1 : 0), 0); }
+
+function initPlaybook(){
+  document.getElementById('flowrow').innerHTML =
+    `<span class="fchip src">${CAMERA_ICON} Film once</span>
+     <span class="farrow">${ARROW_ICON}</span>
+     <span class="fchip">${ICONS.tiktok} TikTok</span>
+     <span class="farrow">${ARROW_ICON}</span>
+     <span class="fchip">${ICONS.instagram} Instagram Reel</span>
+     <span class="farrow">${ARROW_ICON}</span>
+     <span class="fchip">${ICONS.youtube} YouTube Short</span>`;
+  pbRender();
+}
+
+function pbRender(){
+  const totalDone = PLAYBOOK.reduce((s,pf) => s + pbCount(pf), 0);
+  const totalAll  = PLAYBOOK.reduce((s,pf) => s + pf.actions.length, 0);
+  document.getElementById('pb-total').textContent = `${totalDone} of ${totalAll} actions live`;
+
+  document.getElementById('pb-tabs').innerHTML = PLAYBOOK.map(pf => {
+    const done = pbCount(pf), all = pf.actions.length;
+    return `<button class="pb-tab${pf.id === pbActive ? ' on' : ''}${done === all ? ' done' : ''}"
+      role="tab" aria-selected="${pf.id === pbActive}" data-pf="${pf.id}">
+      ${ICONS[pf.id]||''} ${pf.name} <span class="cnt">${done}/${all}</span></button>`;
+  }).join('');
+  document.querySelectorAll('.pb-tab').forEach(b =>
+    b.addEventListener('click', () => { pbActive = b.dataset.pf; pbRender(); }));
+
+  const pf = PLAYBOOK.find(x => x.id === pbActive);
+  const done = pbCount(pf), all = pf.actions.length;
+  document.getElementById('pb-panel').innerHTML = `
+    <div class="pb-role">
+      <span class="picon" style="color:var(--purple-mid)">${ICONS[pf.id]||''}</span>
+      <span class="r">${pf.role}</span>
+      <span class="pb-stat">${pf.stat}</span>
+    </div>
+    <div class="pb-bar"><div class="fill" style="width:${all ? (100*done/all) : 0}%"></div></div>
+    <div class="todo">${pf.actions.map((a,i) => {
+      const on = !!pbState[pf.id+':'+i];
+      return `<button class="task${on ? ' done' : ''}" data-i="${i}" aria-pressed="${on}">
+        <span class="box">${CHECK_ICON}</span>
+        <span><span class="tt">${a.t}</span><br>
+          <span class="tc">${a.c}</span><br>
+          <span class="fq">${a.f}</span></span>
+      </button>`;
+    }).join('')}</div>`;
+  document.querySelectorAll('.task').forEach(el =>
+    el.addEventListener('click', () => {
+      const key = pf.id + ':' + el.dataset.i;
+      pbState[key] = !pbState[key];
+      pbSave();
+      pbRender();
+    }));
+}
+
+// ---------- motion & nav ----------
+function countUp(el, target){
+  if(REDUCED || target <= 0){ el.textContent = FULL(target); return; }
+  const t0 = performance.now(), dur = 900;
+  const tick = now => {
+    const p = Math.min(1, (now - t0) / dur);
+    el.textContent = FULL(Math.round(target * (1 - Math.pow(1 - p, 3))));
+    if(p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function initMotion(){
+  if(REDUCED) return;
+  const els = document.querySelectorAll('#report > div > section, #report .hero, #report .pcard');
+  els.forEach((el, i) => {
+    el.classList.add('rise');
+    el.style.animationDelay = Math.min(i * 60, 480) + 'ms';
+  });
+}
+
+function initNav(){
+  const links = [...document.querySelectorAll('#navlinks a')];
+  const byId = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        links.forEach(a => a.classList.remove('on'));
+        (byId[e.target.id] || links[0]).classList.add('on');
+      }
+    });
+  }, {rootMargin: '-25% 0px -65% 0px'});
+  ['overview','growth','engagement','content','audience','playbook']
+    .forEach(id => { const el = document.getElementById(id); if(el) obs.observe(el); });
 }
 </script>
 </body>

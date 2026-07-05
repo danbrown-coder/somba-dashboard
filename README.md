@@ -64,9 +64,10 @@ Two easy ways, both optional:
   are illustrative estimates** (the section's note line says so) because
   platforms only show real demographics to the account owner inside their
   apps. See below for swapping in the real numbers.
-- **Growth strategy** — the overall playbook (film once → post to TikTok,
-  Reels, and Shorts) plus a per-platform breakdown of each channel's job
-  and next moves.
+- **The growth playbook** — an interactive checklist: switch between platforms,
+  tap actions as they go live, and watch the progress bars fill. Progress is
+  saved in each viewer's own browser (your checkmarks won't appear on someone
+  else's computer).
 
 ## Replacing the estimated demographics with real numbers
 
