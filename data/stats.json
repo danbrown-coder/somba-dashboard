@@ -87,17 +87,45 @@
           "source": "scrape"
         }
       }
+    },
+    {
+      "date": "2026-07-06",
+      "platforms": {
+        "instagram": {
+          "followers": 756,
+          "following": 285,
+          "posts": 512,
+          "source": "carried",
+          "carried_from": "2026-07-05"
+        },
+        "tiktok": {
+          "followers": 151,
+          "likes": 13900,
+          "videos": 440,
+          "source": "scrape"
+        },
+        "youtube": {
+          "followers": 242,
+          "videos": 222,
+          "views": 421153,
+          "source": "scrape"
+        },
+        "linkedin": {
+          "followers": 3,
+          "source": "scrape"
+        }
+      }
     }
   ],
   "recent_videos": {
-    "fetched": "2026-07-05",
+    "fetched": "2026-07-06",
     "source": "youtube-rss",
     "videos": [
       {
         "id": "qK-rEkv98jc",
         "title": "Last Event Energy #trackandfield #track #teammates #teamwork #athletes #teamenergy #relays #fyp",
         "published": "2026-05-07",
-        "views": 598,
+        "views": 599,
         "likes": 8
       },
       {
@@ -146,7 +174,7 @@
         "id": "vEeukGTrvqE",
         "title": "Study abroad students every Friday #studyabroad #travel #weekendtrip",
         "published": "2026-04-16",
-        "views": 6079,
+        "views": 6081,
         "likes": 82
       },
       {
