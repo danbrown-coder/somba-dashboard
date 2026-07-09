@@ -33,13 +33,29 @@ GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/b
 
 # ---------------------------------------------------------------- helpers
 
-def http_get(url, user_agent, timeout=25):
+def http_get(url, user_agent, timeout=25, headers=None):
     """Fetch a URL and return its body as text. Raises on any failure."""
-    req = urllib.request.Request(url, headers={"User-Agent": user_agent})
+    all_headers = {"User-Agent": user_agent}
+    if headers:
+        all_headers.update(headers)
+    req = urllib.request.Request(url, headers=all_headers)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         if resp.status != 200:
             raise RuntimeError("HTTP %s" % resp.status)
         return resp.read().decode("utf-8", errors="replace")
+
+
+def http_post_json(url, payload, user_agent, timeout=25):
+    """POST a JSON body and return the parsed JSON response."""
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode(),
+        headers={"User-Agent": user_agent, "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        if resp.status != 200:
+            raise RuntimeError("HTTP %s" % resp.status)
+        return json.loads(resp.read().decode("utf-8", errors="replace"))
 
 
 def parse_abbrev(s):
@@ -146,6 +162,166 @@ def fetch_youtube_videos(channel_id):
     if not videos:
         raise RuntimeError("no entries in the YouTube feed")
     return videos
+
+
+# --- all-time top videos -------------------------------------------------
+# The RSS feed above only carries the ~15 newest uploads, so the all-time
+# list walks the channel's Videos and Shorts tabs the same way the YouTube
+# page itself does: its embedded "Innertube" browse endpoint. The API key it
+# needs is public and printed inside every YouTube page — we scrape it fresh
+# each run, so there is still nothing to configure and nothing secret here.
+
+CONSENT_COOKIE = {"Cookie": "SOCS=CAI"}  # skips the EU consent interstitial
+SHORTS_TAB_PARAMS = "EgZzaG9ydHPyBgUKA5oBAA=="
+VIDEOS_TAB_PARAMS = "EgZ2aWRlb3PyBgQKAjoA"
+
+
+def _walk_collect(obj, key, out):
+    """Collect every value stored under `key` anywhere in a nested JSON blob."""
+    if isinstance(obj, dict):
+        if key in obj:
+            out.append(obj[key])
+        for v in obj.values():
+            _walk_collect(v, key, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            _walk_collect(v, key, out)
+    return out
+
+
+def _continuation_token(browse_response):
+    items = _walk_collect(browse_response, "continuationItemRenderer", [])
+    for it in items:
+        token = (
+            it.get("continuationEndpoint", {})
+            .get("continuationCommand", {})
+            .get("token")
+        )
+        if token:
+            return token
+    return None
+
+
+def fetch_youtube_top_videos(channel_id):
+    """All-time most-viewed uploads (Shorts + videos). Returns (videos, scanned)."""
+    page = http_get(
+        "https://www.youtube.com/channel/%s/videos" % channel_id,
+        CHROME_UA,
+        headers=CONSENT_COOKIE,
+    )
+    key = re.search(r'"INNERTUBE_API_KEY":"([^"]+)"', page)
+    ver = re.search(r'"INNERTUBE_CONTEXT_CLIENT_VERSION":"([^"]+)"', page)
+    if not (key and ver):
+        raise RuntimeError("could not read the YouTube page config")
+    browse_url = "https://www.youtube.com/youtubei/v1/browse?key=" + key.group(1)
+    context = {
+        "client": {
+            "clientName": "WEB",
+            "clientVersion": ver.group(1),
+            "hl": "en",
+            "gl": "US",
+        }
+    }
+
+    found = {}  # id -> {title, views, kind}
+
+    # Shorts tab: pages of shortsLockupViewModel entries, follow continuations.
+    resp = http_post_json(
+        browse_url,
+        {"context": context, "browseId": channel_id, "params": SHORTS_TAB_PARAMS},
+        CHROME_UA,
+    )
+    for _ in range(12):  # safety cap; ~48 Shorts per page
+        for lockup in _walk_collect(resp, "shortsLockupViewModel", []):
+            vid = (
+                lockup.get("onTap", {})
+                .get("innertubeCommand", {})
+                .get("reelWatchEndpoint", {})
+                .get("videoId")
+            )
+            title = lockup.get("overlayMetadata", {}).get("primaryText", {}).get("content")
+            views = lockup.get("overlayMetadata", {}).get("secondaryText", {}).get("content", "")
+            m = re.match(r"([\d.,]+[KMB]?)\s+views", views or "")
+            if vid and title:
+                found[vid] = {
+                    "title": title,
+                    "views": parse_abbrev(m.group(1)) if m else None,
+                    "kind": "short",
+                }
+        token = _continuation_token(resp)
+        if not token:
+            break
+        resp = http_post_json(browse_url, {"context": context, "continuation": token}, CHROME_UA)
+
+    # Videos tab: the channel's long-form uploads (a single small page).
+    resp = http_post_json(
+        browse_url,
+        {"context": context, "browseId": channel_id, "params": VIDEOS_TAB_PARAMS},
+        CHROME_UA,
+    )
+    # Newer responses use lockupViewModel...
+    for lv in _walk_collect(resp, "lockupViewModel", []):
+        if lv.get("contentType") != "LOCKUP_CONTENT_TYPE_VIDEO":
+            continue
+        vid = lv.get("contentId")
+        md = lv.get("metadata", {}).get("lockupMetadataViewModel", {})
+        title = md.get("title", {}).get("content")
+        views = None
+        rows = md.get("metadata", {}).get("contentMetadataViewModel", {}).get("metadataRows", [])
+        for row in rows:
+            for part in row.get("metadataParts", []):
+                m = re.match(r"([\d.,]+[KMB]?)\s+view", part.get("text", {}).get("content", ""))
+                if m:
+                    views = parse_abbrev(m.group(1))
+        if vid and title:
+            found[vid] = {"title": title, "views": views, "kind": "video"}
+    # ...older ones use videoRenderer. Parse both so a format flip can't break us.
+    for vr in _walk_collect(resp, "videoRenderer", []):
+        vid = vr.get("videoId")
+        runs = vr.get("title", {}).get("runs", [])
+        title = runs[0].get("text") if runs else None
+        views = vr.get("viewCountText", {}).get("simpleText", "")
+        m = re.match(r"([\d.,]+[KMB]?)\s+view", views or "")
+        if vid and title:
+            found[vid] = {
+                "title": title,
+                "views": parse_abbrev(m.group(1)) if m else None,
+                "kind": "video",
+            }
+
+    if not found:
+        raise RuntimeError("no uploads found on the channel tabs")
+
+    top = sorted(
+        ({"id": vid, **info} for vid, info in found.items()),
+        key=lambda v: v["views"] or 0,
+        reverse=True,
+    )[:12]
+
+    # Enrich the winners from their watch pages: exact views, likes, date.
+    for v in top:
+        try:
+            watch = http_get(
+                "https://www.youtube.com/watch?v=" + v["id"],
+                CHROME_UA,
+                headers=CONSENT_COOKIE,
+            )
+            views = re.search(r'"viewCount":"(\d+)"', watch)
+            likes = re.search(r'"likeCount":"(\d+)"', watch)
+            pub = re.search(r'"publishDate":"(\d{4}-\d{2}-\d{2})', watch) or re.search(
+                r'"uploadDate":"(\d{4}-\d{2}-\d{2})', watch
+            )
+            if views:
+                v["views"] = int(views.group(1))
+            v["likes"] = int(likes.group(1)) if likes else None
+            v["published"] = pub.group(1) if pub else None
+        except Exception:
+            v.setdefault("likes", None)
+            v.setdefault("published", None)
+        time.sleep(1)
+
+    top.sort(key=lambda v: v["views"] or 0, reverse=True)
+    return top, len(found)
 
 
 FETCHERS = {
@@ -298,6 +474,20 @@ def main():
             vids = fetch_youtube_videos(yt["channel_id"])
             data["recent_videos"] = {"fetched": today, "source": "youtube-rss", "videos": vids}
             print("ok (%d videos)" % len(vids))
+        except Exception as e:
+            print("could not read (%s) — reused last list" % e)
+
+        sys.stdout.write("  All-time top videos... ")
+        sys.stdout.flush()
+        try:
+            top, scanned = fetch_youtube_top_videos(yt["channel_id"])
+            data["top_videos"] = {
+                "fetched": today,
+                "source": "youtube-innertube",
+                "total_scanned": scanned,
+                "videos": top,
+            }
+            print("ok (top %d of %d uploads)" % (len(top), scanned))
         except Exception as e:
             print("could not read (%s) — reused last list" % e)
 

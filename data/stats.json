@@ -115,10 +115,37 @@
           "source": "scrape"
         }
       }
+    },
+    {
+      "date": "2026-07-09",
+      "platforms": {
+        "instagram": {
+          "followers": 755,
+          "following": 285,
+          "posts": 512,
+          "source": "scrape"
+        },
+        "tiktok": {
+          "followers": 151,
+          "likes": 13900,
+          "videos": 440,
+          "source": "scrape"
+        },
+        "youtube": {
+          "followers": 242,
+          "videos": 222,
+          "views": 421216,
+          "source": "scrape"
+        },
+        "linkedin": {
+          "followers": 3,
+          "source": "scrape"
+        }
+      }
     }
   ],
   "recent_videos": {
-    "fetched": "2026-07-06",
+    "fetched": "2026-07-09",
     "source": "youtube-rss",
     "videos": [
       {
@@ -132,7 +159,7 @@
         "id": "mtbnjLbYoKI",
         "title": "POV: Class of 2027 #classof2027 #senior #junior #realitycheck #collegehumor #studentlife",
         "published": "2026-05-01",
-        "views": 1803,
+        "views": 1809,
         "likes": 5
       },
       {
@@ -188,8 +215,8 @@
         "id": "tmzuQeGtxyE",
         "title": "Preparing for FBLA... #fbla #fyp #funny #trending #students #academics",
         "published": "2026-04-12",
-        "views": 2942,
-        "likes": 43
+        "views": 2943,
+        "likes": 44
       },
       {
         "id": "mvoIm97doQE",
@@ -202,7 +229,7 @@
         "id": "7IHL3jwjDx8",
         "title": "Dance to enter the time conference #fbla #sectionals #fyp #viral #ytshorts",
         "published": "2026-04-10",
-        "views": 5081,
+        "views": 5082,
         "likes": 56
       },
       {
@@ -288,6 +315,109 @@
       {
         "name": "Santa Barbara area",
         "pct": 7
+      }
+    ]
+  },
+  "top_videos": {
+    "fetched": "2026-07-09",
+    "source": "youtube-innertube",
+    "total_scanned": 222,
+    "videos": [
+      {
+        "id": "NoQCO_MRzNY",
+        "title": "Thank you sharks for taking my business opportunity #college #business #sharktank",
+        "views": 65896,
+        "kind": "short",
+        "likes": 335,
+        "published": "2024-03-31"
+      },
+      {
+        "id": "hMJM7bv4bGM",
+        "title": "Dog in da College House! #dog #college #house #ytshorts #explore",
+        "views": 26004,
+        "kind": "short",
+        "likes": 92,
+        "published": "2025-11-01"
+      },
+      {
+        "id": "CS6dNGU9Evc",
+        "title": "When my friend makes a jokes #businessstudent #businessmajor #businesscasual #college #student",
+        "views": 25921,
+        "kind": "short",
+        "likes": 357,
+        "published": "2026-04-03"
+      },
+      {
+        "id": "4-lk-xDXf_A",
+        "title": "Friggin packet yo #frigginpacketyo",
+        "views": 22892,
+        "kind": "short",
+        "likes": 444,
+        "published": "2025-03-23"
+      },
+      {
+        "id": "UD45ksQvtmc",
+        "title": "99.99% accuracy #fyp #pizza #ytshorts",
+        "views": 22768,
+        "kind": "short",
+        "likes": 71,
+        "published": "2026-03-31"
+      },
+      {
+        "id": "-iPsWtoqSjQ",
+        "title": "Sigma Boy #sigmaboy",
+        "views": 14526,
+        "kind": "short",
+        "likes": 125,
+        "published": "2025-03-22"
+      },
+      {
+        "id": "HF8-oqSGewQ",
+        "title": "Spending time with family during Thanksgiving has us like…”We’re sisters!” #college #weresisters",
+        "views": 13761,
+        "kind": "short",
+        "likes": 459,
+        "published": "2023-12-01"
+      },
+      {
+        "id": "fH3i3zeNbqk",
+        "title": "When the Dean is reading brain rot words #brainrot",
+        "views": 10137,
+        "kind": "short",
+        "likes": 203,
+        "published": "2025-03-19"
+      },
+      {
+        "id": "8eKBn5whDy8",
+        "title": "Mannequin challenge #2016 #mannequinchallenge #FBLA #ytshorts #fyp",
+        "views": 7479,
+        "kind": "short",
+        "likes": 55,
+        "published": "2026-04-01"
+      },
+      {
+        "id": "2XzUKmCBwTY",
+        "title": "POV: You're trying to hang on during midterms #college #studentlife #midterms #ytshorts #explore",
+        "views": 7374,
+        "kind": "short",
+        "likes": 28,
+        "published": "2025-10-27"
+      },
+      {
+        "id": "zArZjKlR8lI",
+        "title": "We’re students finals week struggles #college #relatable #shorts #werestudents #weresisters",
+        "views": 7318,
+        "kind": "short",
+        "likes": 233,
+        "published": "2023-12-10"
+      },
+      {
+        "id": "WCof1cj2xeo",
+        "title": "That's my man!!! #fyp #basketball #funny #fbla #myman",
+        "views": 6274,
+        "kind": "short",
+        "likes": 27,
+        "published": "2026-04-05"
       }
     ]
   }

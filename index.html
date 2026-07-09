@@ -363,8 +363,15 @@
       <section id="sec-videos" class="hidden">
         <div class="kicker">On screen</div>
         <h2 class="serif">Recent content</h2>
-        <p class="note">The most recent YouTube uploads, ranked by views. Hashtag titles are Shorts.</p>
+        <p class="note" id="vidnote">The most recent YouTube uploads, ranked by views. Hashtag titles are Shorts.</p>
         <div id="vidlist"></div>
+      </section>
+
+      <section id="sec-topvideos" class="hidden">
+        <div class="kicker">On screen</div>
+        <h2 class="serif">All-time greats</h2>
+        <p class="note" id="topvidnote">The most-viewed uploads in the channel's history.</p>
+        <div id="topvidlist"></div>
       </section>
     </div>
 
@@ -549,6 +556,7 @@ function render(d){
   // --- always-on insight sections, each independently degradable ---
   try{ renderEngagement(platforms, snaps); }catch(e){}
   try{ renderVideos(d); }catch(e){}
+  try{ renderTopVideos(d); }catch(e){}
   try{ renderMix(platforms, snaps); }catch(e){}
   try{ renderDemographics(d); }catch(e){}
   try{ initPlaybook(); }catch(e){}
@@ -693,21 +701,46 @@ function renderEngagement(platforms, snaps){
 }
 
 // ---------- recent content ----------
-function renderVideos(d){
-  const rv = d.recent_videos;
-  if(!rv || !rv.videos || !rv.videos.length) return;
-  const vids = rv.videos.slice().sort((a,b) => (b.views ?? -1) - (a.views ?? -1)).slice(0,8);
-  document.getElementById('vidlist').innerHTML = vids.map((v,i) => `
+function vidRows(vids){
+  return vids.map((v,i) => `
     <div class="vidrow${i === 0 ? ' top' : ''}">
       <div class="rank">${i+1}</div>
       <div>
         <div class="t"><a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}" target="_blank" rel="noopener">${escapeHtml(v.title)}</a></div>
-        <div class="meta">${ageOf(v.published)}</div>
+        <div class="meta">${v.published ? ageOf(v.published) : (v.kind === 'video' ? 'video' : 'Short')}</div>
       </div>
       <div class="v"><b>${v.views == null ? '—' : FULL(v.views)}</b>
         <small>views${v.likes != null ? ' · ' + FULL(v.likes) + ' likes' : ''}</small></div>
     </div>`).join('');
+}
+
+function renderVideos(d){
+  const rv = d.recent_videos;
+  if(!rv || !rv.videos || !rv.videos.length) return;
+  const dates = rv.videos.map(v => v.published).filter(Boolean).sort();
+  if(dates.length){
+    const from = dates[0], to = dates[dates.length-1];
+    const range = from === to ? prettyDate(to)
+      : (from.slice(0,4) === to.slice(0,4) ? shortDate(from) : prettyDate(from)) + ' – ' + prettyDate(to);
+    document.getElementById('vidnote').textContent =
+      `The ${rv.videos.length} most recent uploads, published ${range} — ranked by views. Hashtag titles are Shorts.`;
+  }
+  const vids = rv.videos.slice().sort((a,b) => (b.views ?? -1) - (a.views ?? -1)).slice(0,8);
+  document.getElementById('vidlist').innerHTML = vidRows(vids);
   show('sec-videos');
+}
+
+// ---------- all-time top content ----------
+function renderTopVideos(d){
+  const tv = d.top_videos;
+  if(!tv || !tv.videos || !tv.videos.length) return;
+  if(tv.total_scanned){
+    document.getElementById('topvidnote').textContent =
+      `The most-viewed uploads in the channel's history, across all ${FULL(tv.total_scanned)} videos and Shorts ever posted.`;
+  }
+  const vids = tv.videos.slice().sort((a,b) => (b.views ?? -1) - (a.views ?? -1)).slice(0,8);
+  document.getElementById('topvidlist').innerHTML = vidRows(vids);
+  show('sec-topvideos');
 }
 
 // ---------- audience mix ----------
