@@ -448,5 +448,45 @@
         "published": null
       }
     ]
+  },
+  "engagement": {
+    "period": "Last 30 days",
+    "updated": "2026-07-14",
+    "is_sample": true,
+    "note": "Per-platform totals from each channel's native analytics (IG Insights, TikTok Analytics, YouTube Studio, LinkedIn). Replace sample values — see ENGAGEMENT-DATA.md.",
+    "platforms": {
+      "instagram": {
+        "reach": 5200,
+        "posts": 12,
+        "likes": 260,
+        "comments": 30,
+        "shares": 28,
+        "saves": 70
+      },
+      "tiktok": {
+        "reach": 22000,
+        "posts": 9,
+        "likes": 1850,
+        "comments": 70,
+        "shares": 240,
+        "saves": 130
+      },
+      "youtube": {
+        "reach": 6200,
+        "posts": 5,
+        "likes": 210,
+        "comments": 24,
+        "shares": 18,
+        "saves": 0
+      },
+      "linkedin": {
+        "reach": 900,
+        "posts": 4,
+        "likes": 26,
+        "comments": 8,
+        "shares": 5,
+        "saves": 0
+      }
+    }
   }
 }
