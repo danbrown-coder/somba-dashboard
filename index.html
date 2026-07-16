@@ -137,8 +137,9 @@
   .range-btn{appearance:none;border:0;background:transparent;cursor:pointer;
     font:inherit;font-size:13px;font-weight:600;color:var(--muted);
     padding:5px 14px;border-radius:999px;transition:background .15s,color .15s}
-  .range-btn:hover{color:var(--purple-mid)}
+  .range-btn:hover:not(:disabled){color:var(--purple-mid)}
   .range-btn.on{background:var(--purple);color:#fff}
+  .range-btn:disabled{opacity:.35;cursor:default}
   .range-reset{appearance:none;background:#fff;border:1px solid var(--border);
     border-radius:999px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;
     color:var(--muted);padding:6px 14px;transition:border-color .15s,color .15s}
@@ -388,7 +389,7 @@
           <div class="range-seg">
             <button type="button" class="range-btn" data-unit="day">Day</button>
             <button type="button" class="range-btn" data-unit="week">Week</button>
-            <button type="button" class="range-btn on" data-unit="month">Month</button>
+            <button type="button" class="range-btn" data-unit="month">Month</button>
             <button type="button" class="range-btn" data-unit="year">Year</button>
           </div>
           <button type="button" class="range-reset" id="range-reset">Reset zoom</button>
@@ -652,7 +653,7 @@ function render(d){
   if(snaps.length >= 2){
     renderHistoryCharts(platforms, snaps);
     try{ renderTrends(platforms, snaps); }catch(e){}
-    try{ initTimeControls(); }catch(e){}
+    try{ initTimeControls(snaps); }catch(e){}
     try{ renderPace(platforms, snaps); }catch(e){}
   } else {
     document.getElementById('charts-soon').classList.remove('hidden');
@@ -668,10 +669,46 @@ function render(d){
   initNav();
 }
 
-// The x-axis label granularity, shared by every time-series chart; the Day/Week/
-// Month/Year toggle flips this and re-draws them. Zoom lets you dive finer than this.
-let CURRENT_UNIT = 'month';
-const TIME_CHARTS = [];
+// The timeline granularity shared by every time-series chart. Auto-picked from the
+// data span on first render; the Day/Week/Month/Year toggle re-buckets every chart.
+let CURRENT_UNIT = 'day';
+const TIME_CHARTS = [];   // {chart, points} — raw points kept so the toggle can re-bucket
+const TOOLTIP_FMT = {day:'MMM d, yyyy', week:"'Week of' MMM d, yyyy", month:'MMM yyyy', year:'yyyy'};
+
+function mondayOf(iso){
+  const d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  return d.toISOString().slice(0, 10);
+}
+
+// Collapse raw points to one per day/week/month/year. Every series here is a
+// cumulative level (followers, lifetime views), so each bucket keeps its LAST
+// reading, plotted at the bucket's start so the axis reads like a calendar series.
+function bucketPoints(points, unit){
+  const pts = points.filter(p => p.val != null);
+  if(unit === 'day') return pts.map(p => ({x: p.date, y: p.val}));
+  const keyOf = iso => unit === 'week'  ? mondayOf(iso)
+                     : unit === 'month' ? iso.slice(0, 7) + '-01'
+                     :                    iso.slice(0, 4) + '-01-01';
+  const buckets = new Map();                    // snapshots are date-sorted → last wins
+  pts.forEach(p => buckets.set(keyOf(p.date), p.val));
+  return [...buckets].map(([x, y]) => ({x, y}));
+}
+
+function unitBucketCount(dates, unit){
+  return new Set(dates.map(iso => unit === 'day' ? iso
+    : unit === 'week' ? mondayOf(iso)
+    : unit === 'month' ? iso.slice(0, 7) : iso.slice(0, 4))).size;
+}
+
+// Finest granularity that suits the data span — Day while history is short,
+// Month once months of snapshots exist, Year for multi-year archives.
+function pickUnit(dates){
+  const span = (new Date(dates[dates.length - 1] + 'T12:00:00') -
+                new Date(dates[0] + 'T12:00:00')) / 86400000;
+  const ideal = span <= 45 ? 'day' : span <= 200 ? 'week' : span <= 1100 ? 'month' : 'year';
+  return unitBucketCount(dates, ideal) >= 2 ? ideal : 'day';
+}
 
 // One place that builds every zoomable time-series line chart. `points` is an array
 // of {date, val}; nulls are dropped so gaps bridge honestly. `opt`: {label, color,
@@ -679,7 +716,7 @@ const TIME_CHARTS = [];
 function timeChart(target, points, opt){
   opt = opt || {};
   const color = opt.color || '#5d4380';
-  const data = points.filter(p => p.val != null).map(p => ({x:p.date, y:p.val}));
+  const data = bucketPoints(points, CURRENT_UNIT);
   const ptRadius = data.length < 8 ? 3 : 0;
   const chart = new Chart(target, {
     type:'line',
@@ -694,23 +731,29 @@ function timeChart(target, points, opt){
           zoom:{ drag:{enabled:true, backgroundColor:'rgba(93,67,128,.14)',
                        borderColor:'#5d4380', borderWidth:1},
                  pinch:{enabled:true}, mode:'x' },
-          pan:{enabled:false}
+          pan:{enabled:false},
+          limits:{x:{min:'original', max:'original'}}
         }
       },
       scales:{
-        x:{ type:'time',
-            time:{ unit: CURRENT_UNIT, tooltipFormat:'MMM d, yyyy',
+        x:{ type:'time', bounds:'data',
+            time:{ unit: CURRENT_UNIT, tooltipFormat: TOOLTIP_FMT[CURRENT_UNIT],
                    displayFormats:{day:'MMM d', week:'MMM d', month:'MMM yyyy', year:'yyyy'} },
+            // ticks come FROM the data points so the axis always has labels —
+            // unit-boundary ticks can vanish entirely on short spans (lived bug)
+            ticks:{source:'data', autoSkip:true, maxTicksLimit:8, maxRotation:0},
             grid:{display:false} },
-        y:{ beginAtZero: !!opt.yZero, grid:{color:'#efe9f6'}, ticks:{callback: v => FMT(v)} }
+        y:{ beginAtZero: !!opt.yZero, grid:{color:'#efe9f6'},
+            ticks:{precision:0, callback: v => FMT(v)} }
       }
     }
   });
-  TIME_CHARTS.push(chart);
+  TIME_CHARTS.push({chart, points});
   return chart;
 }
 
 function renderHistoryCharts(platforms, snaps){
+  CURRENT_UNIT = pickUnit(snaps.map(s => s.date));
   const grid = document.getElementById('chartgrid');
   platforms.forEach(p => {
     const pts = series(snaps, p.id);
@@ -789,18 +832,39 @@ function renderTrends(platforms, snaps){
 }
 
 // ---------- timeline zoom controls (shared across every time chart) ----------
-function initTimeControls(){
+// Re-bucket every chart's DATA to the new unit — the line visibly changes shape,
+// it doesn't just relabel the axis.
+function setTimelineUnit(unit){
+  CURRENT_UNIT = unit;
+  TIME_CHARTS.forEach(({chart, points}) => {
+    const data = bucketPoints(points, unit);
+    chart.data.datasets[0].data = data;
+    chart.data.datasets[0].pointRadius = data.length < 8 ? 3 : 0;
+    chart.options.scales.x.time.unit = unit;
+    chart.options.scales.x.time.tooltipFormat = TOOLTIP_FMT[unit];
+    if(chart.resetZoom) chart.resetZoom('none');
+    chart.update();
+  });
+}
+
+function initTimeControls(snaps){
   const ctl = document.getElementById('range-ctl');
   if(!ctl || !TIME_CHARTS.length) return;
+  const dates = snaps.map(s => s.date);
   ctl.querySelectorAll('.range-btn').forEach(btn => {
+    const unit = btn.dataset.unit;
+    // a unit needs ≥2 buckets to draw a line; coarser ones unlock as history builds
+    const enough = unitBucketCount(dates, unit) >= 2;
+    btn.disabled = !enough;
+    if(!enough) btn.title = 'Needs more history — unlocks as weekly updates build up';
+    btn.classList.toggle('on', unit === CURRENT_UNIT);
     btn.addEventListener('click', () => {
-      CURRENT_UNIT = btn.dataset.unit;
       ctl.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('on', b === btn));
-      TIME_CHARTS.forEach(c => { c.options.scales.x.time.unit = CURRENT_UNIT; c.update(); });
+      setTimelineUnit(unit);
     });
   });
   const reset = document.getElementById('range-reset');
-  if(reset) reset.addEventListener('click', () => TIME_CHARTS.forEach(c => c.resetZoom && c.resetZoom()));
+  if(reset) reset.addEventListener('click', () => TIME_CHARTS.forEach(t => t.chart.resetZoom && t.chart.resetZoom()));
 }
 
 // ---------- insight helpers ----------
