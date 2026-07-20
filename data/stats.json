@@ -170,10 +170,38 @@
           "source": "scrape"
         }
       }
+    },
+    {
+      "date": "2026-07-20",
+      "platforms": {
+        "instagram": {
+          "followers": 755,
+          "following": 285,
+          "posts": 512,
+          "source": "carried",
+          "carried_from": "2026-07-09"
+        },
+        "tiktok": {
+          "followers": 151,
+          "likes": 13900,
+          "videos": 440,
+          "source": "scrape"
+        },
+        "youtube": {
+          "followers": 243,
+          "videos": 222,
+          "views": 421607,
+          "source": "scrape"
+        },
+        "linkedin": {
+          "followers": 3,
+          "source": "scrape"
+        }
+      }
     }
   ],
   "recent_videos": {
-    "fetched": "2026-07-13",
+    "fetched": "2026-07-20",
     "source": "youtube-rss",
     "videos": [
       {
@@ -187,8 +215,8 @@
         "id": "mtbnjLbYoKI",
         "title": "POV: Class of 2027 #classof2027 #senior #junior #realitycheck #collegehumor #studentlife",
         "published": "2026-05-01",
-        "views": 1819,
-        "likes": 7
+        "views": 1841,
+        "likes": 8
       },
       {
         "id": "tAgIxdUgU4M",
@@ -278,7 +306,7 @@
         "id": "mKtqrCU3cTI",
         "title": "A-Aron 99.67% accuracy #viral #trending #fyp #fbla #meme #funny #skit #fyp",
         "published": "2026-04-07",
-        "views": 2572,
+        "views": 2573,
         "likes": 61
       }
     ]
@@ -347,7 +375,7 @@
     ]
   },
   "top_videos": {
-    "fetched": "2026-07-13",
+    "fetched": "2026-07-20",
     "source": "youtube-innertube",
     "total_scanned": 221,
     "videos": [
@@ -418,7 +446,7 @@
       {
         "id": "8eKBn5whDy8",
         "title": "Mannequin challenge #2016 #mannequinchallenge #FBLA #ytshorts #fyp",
-        "views": 7400,
+        "views": 7500,
         "kind": "short",
         "likes": null,
         "published": null
