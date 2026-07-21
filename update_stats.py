@@ -30,6 +30,12 @@ CHROME_UA = (
 )
 GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 
+# Optional official-API credentials, read from the environment so nothing
+# secret ever lives in this file or the repo. When YOUTUBE_API_KEY is set the
+# script uses YouTube's official Data API for rock-solid numbers; when it is
+# absent everything still works by scraping the public pages as before.
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+
 
 # ---------------------------------------------------------------- helpers
 
@@ -108,6 +114,42 @@ def fetch_tiktok(p):
 
 
 def fetch_youtube(p):
+    """Subscriber, video and total-view counts.
+
+    Prefers YouTube's official Data API (needs YOUTUBE_API_KEY and the
+    channel_id); falls back to scraping the public /about page when no key
+    is configured or the API call fails.
+    """
+    if YOUTUBE_API_KEY and p.get("channel_id"):
+        try:
+            return fetch_youtube_api(p["channel_id"])
+        except Exception:
+            pass  # fall through to the public-page scrape
+    return fetch_youtube_scrape(p)
+
+
+def fetch_youtube_api(channel_id):
+    """Channel counts straight from the YouTube Data API v3."""
+    url = (
+        "https://www.googleapis.com/youtube/v3/channels"
+        "?part=statistics&id=%s&key=%s" % (channel_id, YOUTUBE_API_KEY)
+    )
+    data = json.loads(http_get(url, CHROME_UA))
+    items = data.get("items") or []
+    if not items:
+        raise RuntimeError("YouTube API returned no channel")
+    stats = items[0].get("statistics", {})
+    if "subscriberCount" not in stats:
+        raise RuntimeError("YouTube API did not return a subscriber count")
+    out = {"followers": int(stats["subscriberCount"])}
+    if "videoCount" in stats:
+        out["videos"] = int(stats["videoCount"])
+    if "viewCount" in stats:
+        out["views"] = int(stats["viewCount"])
+    return out
+
+
+def fetch_youtube_scrape(p):
     # The /about page reliably carries subscriber, video and total-view counts.
     url = p["url"].rstrip("/") + "/about"
     html = http_get(url, CHROME_UA)
@@ -162,6 +204,39 @@ def fetch_youtube_videos(channel_id):
     if not videos:
         raise RuntimeError("no entries in the YouTube feed")
     return videos
+
+
+def enrich_videos_via_api(videos):
+    """Fill exact views/likes (and a publish date) from the YouTube Data API.
+
+    Mutates the given list in place. A no-op when no key is configured, so
+    the RSS/scrape numbers simply stand on their own without one.
+    """
+    if not YOUTUBE_API_KEY or not videos:
+        return
+    ids = [v["id"] for v in videos if v.get("id")]
+    info = {}
+    for i in range(0, len(ids), 50):  # the API takes up to 50 ids per call
+        batch = ",".join(ids[i:i + 50])
+        url = (
+            "https://www.googleapis.com/youtube/v3/videos"
+            "?part=statistics,snippet&id=%s&key=%s" % (batch, YOUTUBE_API_KEY)
+        )
+        data = json.loads(http_get(url, CHROME_UA))
+        for item in data.get("items", []):
+            info[item["id"]] = item
+    for v in videos:
+        item = info.get(v["id"])
+        if not item:
+            continue
+        stats = item.get("statistics", {})
+        if "viewCount" in stats:
+            v["views"] = int(stats["viewCount"])
+        if "likeCount" in stats:
+            v["likes"] = int(stats["likeCount"])
+        published = item.get("snippet", {}).get("publishedAt", "")
+        if published and not v.get("published"):
+            v["published"] = published[:10]
 
 
 # --- all-time top videos -------------------------------------------------
@@ -472,6 +547,10 @@ def main():
         sys.stdout.flush()
         try:
             vids = fetch_youtube_videos(yt["channel_id"])
+            try:
+                enrich_videos_via_api(vids)
+            except Exception:
+                pass  # keep the RSS numbers if the enrichment call fails
             data["recent_videos"] = {"fetched": today, "source": "youtube-rss", "videos": vids}
             print("ok (%d videos)" % len(vids))
         except Exception as e:
@@ -481,6 +560,10 @@ def main():
         sys.stdout.flush()
         try:
             top, scanned = fetch_youtube_top_videos(yt["channel_id"])
+            try:
+                enrich_videos_via_api(top)
+            except Exception:
+                pass  # keep the watch-page numbers if the enrichment call fails
             data["top_videos"] = {
                 "fetched": today,
                 "source": "youtube-innertube",
